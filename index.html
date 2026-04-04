@@ -1056,6 +1056,34 @@
     }
 
     /* ─────────────────────────────────────────
+       GALLERY FILTERS
+    ───────────────────────────────────────── */
+    .gallery-filters {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    .gallery-filter {
+      font-family: var(--font-head);
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.45rem 1rem;
+      background: transparent;
+      border: 1px solid var(--rule);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .gallery-filter.active {
+      background: var(--amber);
+      border-color: var(--amber);
+      color: var(--bg);
+    }
+
+    /* ─────────────────────────────────────────
        ANIMATIONS
     ───────────────────────────────────────── */
     @keyframes fadeUp {
@@ -1102,14 +1130,74 @@
     @media (max-width: 768px) {
       .nav-links, .nav-cta { display: none; }
       .hamburger { display: block; }
+
+      /* Hero */
       .hero-stats { display: none; }
+      #hero { padding-bottom: 3rem; min-height: 90vh; }
+      .hero-title { font-size: clamp(2.8rem, 14vw, 4.5rem); }
+      .hero-tagline { font-size: 0.9rem; }
+      .hero-actions { flex-direction: column; }
+      .hero-actions .btn-primary,
+      .hero-actions .btn-ghost { width: 100%; justify-content: center; }
+      .hero-eyebrow { flex-wrap: wrap; }
+
+      /* Sections tighten padding */
+      #about, #services, #process, #gallery, #reviews, #contact {
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+      }
+
+      /* About */
+      .about-text h2 { font-size: clamp(1.8rem, 8vw, 2.5rem); }
+      .father-son { flex-direction: column; }
+
+      /* Services */
+      .service-img { aspect-ratio: 16/9; }
+
+      /* Gallery */
       .gallery-grid {
         grid-template-columns: 1fr 1fr;
-        grid-auto-rows: 200px;
+        grid-auto-rows: 180px;
       }
       .gallery-item { grid-column: span 1 !important; grid-row: span 1 !important; }
+      .gallery-caption { opacity: 1; transform: translateY(0); }
+      .gallery-caption span { font-size: 0.6rem; }
+      .gallery-caption em { font-size: 0.7rem; }
+      .gallery-filters { gap: 0.35rem; }
+      .gallery-filter { padding: 0.4rem 0.7rem; font-size: 0.6rem; }
+
+      /* Reviews */
+      .review-card { padding: 1.5rem; }
+      .review-text { font-size: 0.88rem; }
+      #reviews::before { font-size: 15rem; top: -3rem; }
+
+      /* Contact */
+      .contact-item-value { font-size: 0.85rem; word-break: break-all; }
       .form-row { grid-template-columns: 1fr; }
-      .father-son { flex-direction: column; }
+
+      /* Footer */
+      footer { padding: 2rem 1.25rem; gap: 1.5rem; }
+      .footer-copy, .footer-right { font-size: 0.7rem; }
+
+      /* Image break */
+      .image-break { height: 35vh; min-height: 220px; }
+      .image-break-text .section-title { font-size: clamp(1.3rem, 5vw, 2rem); }
+
+      /* Process steps */
+      .step { grid-template-columns: 40px 1fr; gap: 1rem; }
+      .step-num { font-size: 1.8rem; }
+    }
+
+    /* Very small phones */
+    @media (max-width: 400px) {
+      .hero-title { font-size: 2.6rem; }
+      .gallery-grid { grid-template-columns: 1fr; grid-auto-rows: 220px; }
+      .section-title { font-size: clamp(1.8rem, 8vw, 2.5rem); }
+      .services-grid { gap: 0; }
+      .marquee-inner span { font-size: 0.6rem; padding: 0 1.5rem; }
+      .about-badge { width: 85px; height: 85px; bottom: -1rem; right: -1rem; }
+      .about-badge strong { font-size: 1.1rem; }
+      .about-badge span { font-size: 0.5rem; }
     }
 
     /* Mobile nav */
@@ -1417,13 +1505,13 @@
     </div>
 
     <!-- Filter tabs -->
-    <div class="gallery-filters" style="display:flex; gap:0.5rem; margin-bottom:2rem; flex-wrap:wrap;">
-      <button class="gallery-filter active" data-filter="all" onclick="filterMain('all',this)" style="font-family:var(--font-head);font-size:0.7rem;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;padding:0.45rem 1rem;background:var(--amber);border:1px solid var(--amber);color:var(--bg);cursor:pointer;transition:all 0.2s;">All</button>
-      <button class="gallery-filter" data-filter="deer" onclick="filterMain('deer',this)" style="font-family:var(--font-head);font-size:0.7rem;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;padding:0.45rem 1rem;background:transparent;border:1px solid var(--rule);color:var(--muted);cursor:pointer;transition:all 0.2s;">Deer</button>
-      <button class="gallery-filter" data-filter="turkey" onclick="filterMain('turkey',this)" style="font-family:var(--font-head);font-size:0.7rem;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;padding:0.45rem 1rem;background:transparent;border:1px solid var(--rule);color:var(--muted);cursor:pointer;transition:all 0.2s;">Turkey</button>
-      <button class="gallery-filter" data-filter="duck" onclick="filterMain('duck',this)" style="font-family:var(--font-head);font-size:0.7rem;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;padding:0.45rem 1rem;background:transparent;border:1px solid var(--rule);color:var(--muted);cursor:pointer;transition:all 0.2s;">Duck</button>
-      <button class="gallery-filter" data-filter="bear" onclick="filterMain('bear',this)" style="font-family:var(--font-head);font-size:0.7rem;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;padding:0.45rem 1rem;background:transparent;border:1px solid var(--rule);color:var(--muted);cursor:pointer;transition:all 0.2s;">Bear</button>
-      <button class="gallery-filter" data-filter="other" onclick="filterMain('other',this)" style="font-family:var(--font-head);font-size:0.7rem;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;padding:0.45rem 1rem;background:transparent;border:1px solid var(--rule);color:var(--muted);cursor:pointer;transition:all 0.2s;">Other</button>
+    <div class="gallery-filters">
+      <button class="gallery-filter active" data-filter="all" onclick="filterMain('all',this)">All</button>
+      <button class="gallery-filter" data-filter="deer" onclick="filterMain('deer',this)">Deer</button>
+      <button class="gallery-filter" data-filter="turkey" onclick="filterMain('turkey',this)">Turkey</button>
+      <button class="gallery-filter" data-filter="duck" onclick="filterMain('duck',this)">Duck</button>
+      <button class="gallery-filter" data-filter="bear" onclick="filterMain('bear',this)">Bear</button>
+      <button class="gallery-filter" data-filter="other" onclick="filterMain('other',this)">Other</button>
     </div>
 
     <div class="gallery-grid" id="galleryGrid">
@@ -1792,15 +1880,8 @@
     }
 
     function filterMain(filter, btnEl) {
-      document.querySelectorAll('.gallery-filter').forEach(b => {
-        b.style.background = 'transparent';
-        b.style.borderColor = 'var(--rule)';
-        b.style.color = 'var(--muted)';
-      });
-      btnEl.style.background = 'var(--amber)';
-      btnEl.style.borderColor = 'var(--amber)';
-      btnEl.style.color = 'var(--bg)';
-
+      document.querySelectorAll('.gallery-filter').forEach(b => b.classList.remove('active'));
+      btnEl.classList.add('active');
       window._galleryFilter = filter;
       applyFilter();
     }
