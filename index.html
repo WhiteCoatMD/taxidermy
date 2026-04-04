@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lonely Pines Taxidermy — Preserving Memories, One Mount at a Time</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─────────────────────────────────────────
+       TOKENS
+    ───────────────────────────────────────── */
+    :root {
+      --bg:          #0d0a07;
+      --bg-2:        #160f08;
+      --bg-3:        #1e1509;
+      --walnut:      #2e1f0e;
+      --chestnut:    #4a2f18;
+      --amber:       #c4872f;
+      --amber-light: #e0a84a;
+      --forest:      #4a6840;
+      --cream:       #e8d5b0;
+      --parchment:   #f5ede0;
+      --muted:       #7a6a54;
+      --rule:        rgba(196,135,47,0.25);
+      --font-head:   'Oswald', sans-serif;
+      --font-serif:  'Playfair Display', serif;
+      --font-body:   'Lora', serif;
+    }
+
+    /* ─────────────────────────────────────────
+       RESET & BASE
+    ───────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      background: var(--bg);
+      color: var(--cream);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      line-height: 1.7;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.6;
+    }
+
+    img { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+
+    /* ─────────────────────────────────────────
+       TYPOGRAPHY HELPERS
+    ───────────────────────────────────────── */
+    .label {
+      font-family: var(--font-head);
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--amber);
+    }
+
+    .section-title {
+      font-family: var(--font-head);
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 700;
+      line-height: 1;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      color: var(--parchment);
+    }
+
+    .serif-accent {
+      font-family: var(--font-serif);
+      font-style: italic;
+      color: var(--amber-light);
+    }
+
+    /* ─────────────────────────────────────────
+       ORNAMENT DIVIDER
+    ───────────────────────────────────────── */
+    .ornament {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 2rem 0;
+      color: var(--amber);
+    }
+    .ornament::before,
+    .ornament::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--rule);
+    }
+    .ornament svg { flex-shrink: 0; width: 28px; height: 28px; fill: var(--amber); }
+
+    /* ─────────────────────────────────────────
+       NAV
+    ───────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 100;
+      padding: 0 clamp(1.5rem, 5vw, 4rem);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+      background: linear-gradient(to bottom, rgba(13,10,7,0.95) 0%, rgba(13,10,7,0) 100%);
+      backdrop-filter: blur(2px);
+      transition: background 0.3s, border-color 0.3s;
+      border-bottom: 1px solid transparent;
+    }
+    nav.scrolled {
+      background: rgba(13,10,7,0.97);
+      border-bottom-color: var(--rule);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .nav-logo svg { width: 36px; height: 36px; }
+    .nav-logo-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1;
+    }
+    .nav-logo-text strong {
+      font-family: var(--font-head);
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--parchment);
+    }
+    .nav-logo-text span {
+      font-family: var(--font-body);
+      font-size: 0.65rem;
+      color: var(--amber);
+      letter-spacing: 0.15em;
+      font-style: italic;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-family: var(--font-head);
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--cream);
+      opacity: 0.75;
+      transition: opacity 0.2s, color 0.2s;
+    }
+    .nav-links a:hover { opacity: 1; color: var(--amber-light); }
+
+    .nav-cta {
+      font-family: var(--font-head);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      padding: 0.55rem 1.4rem;
+      border: 1px solid var(--amber);
+      color: var(--amber);
+      transition: background 0.2s, color 0.2s;
+    }
+    .nav-cta:hover { background: var(--amber); color: var(--bg); }
+
+    .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 0.5rem; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: var(--cream); margin: 5px 0; transition: 0.3s; }
+
+    /* ─────────────────────────────────────────
+       HERO
+    ───────────────────────────────────────── */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+      padding: 0 clamp(1.5rem, 6vw, 6rem);
+      padding-bottom: clamp(4rem, 8vw, 7rem);
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+    }
+    .hero-bg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 30%;
+      filter: brightness(0.35) saturate(0.6) sepia(0.3);
+    }
+    /* Warm color wash over image */
+    .hero-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to top, var(--bg) 0%, transparent 40%),
+        linear-gradient(to right, rgba(13,10,7,0.85) 0%, rgba(13,10,7,0.2) 60%),
+        radial-gradient(ellipse 80% 60% at 70% 40%, rgba(74,104,64,0.08) 0%, transparent 60%),
+        linear-gradient(165deg, rgba(26,18,8,0.5) 0%, transparent 50%);
+    }
+
+    .hero-content { position: relative; z-index: 2; max-width: 820px; }
+
+    .hero-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.2s forwards;
+    }
+    .hero-eyebrow::after { content: ''; flex: 0 0 60px; height: 1px; background: var(--amber); }
+
+    .hero-title {
+      font-family: var(--font-head);
+      font-size: clamp(3.5rem, 11vw, 8rem);
+      font-weight: 700;
+      line-height: 0.92;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      color: var(--parchment);
+      margin-bottom: 1rem;
+      opacity: 0;
+      animation: fadeUp 0.9s 0.35s forwards;
+    }
+    .hero-title em {
+      display: block;
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-weight: 400;
+      font-size: 0.55em;
+      color: var(--amber-light);
+      letter-spacing: 0.02em;
+      line-height: 1.4;
+    }
+
+    .hero-tagline {
+      font-family: var(--font-body);
+      font-size: clamp(0.95rem, 2vw, 1.15rem);
+      color: var(--muted);
+      max-width: 480px;
+      margin-bottom: 2.5rem;
+      line-height: 1.75;
+      opacity: 0;
+      animation: fadeUp 0.9s 0.5s forwards;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.9s 0.65s forwards;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: var(--font-head);
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 0.9rem 2rem;
+      background: var(--amber);
+      color: var(--bg);
+      transition: background 0.2s, transform 0.2s;
+      cursor: pointer;
+    }
+    .btn-primary:hover { background: var(--amber-light); transform: translateY(-1px); }
+    .btn-primary svg { width: 16px; height: 16px; }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: var(--font-head);
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 0.9rem 2rem;
+      border: 1px solid rgba(232,213,176,0.25);
+      color: var(--cream);
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-ghost:hover { border-color: var(--cream); }
+
+    /* Hero stats sidebar */
+    .hero-stats {
+      position: absolute;
+      right: clamp(1.5rem, 6vw, 6rem);
+      bottom: clamp(4rem, 8vw, 7rem);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      z-index: 2;
+      opacity: 0;
+      animation: fadeLeft 0.9s 0.8s forwards;
+    }
+    .stat-item { text-align: right; }
+    .stat-number {
+      font-family: var(--font-head);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--amber);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-family: var(--font-head);
+    }
+    .stat-rule { width: 100%; height: 1px; background: var(--rule); margin-top: 1.5rem; }
+
+    /* ─────────────────────────────────────────
+       MARQUEE BAND
+    ───────────────────────────────────────── */
+    .marquee-band {
+      background: var(--amber);
+      padding: 0.7rem 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .marquee-inner {
+      display: inline-block;
+      animation: marquee 22s linear infinite;
+    }
+    .marquee-inner span {
+      font-family: var(--font-head);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--bg);
+      padding: 0 2.5rem;
+    }
+    .marquee-dot { color: var(--walnut); opacity: 0.5; }
+
+    /* ─────────────────────────────────────────
+       ABOUT
+    ───────────────────────────────────────── */
+    #about {
+      padding: clamp(5rem, 10vw, 9rem) clamp(1.5rem, 6vw, 6rem);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(3rem, 6vw, 7rem);
+      align-items: center;
+    }
+
+    .about-visual { position: relative; }
+
+    .about-frame {
+      position: relative;
+      aspect-ratio: 3/4;
+      overflow: hidden;
+      border: 1px solid var(--rule);
+    }
+    .about-frame::before {
+      content: '';
+      position: absolute;
+      inset: 10px;
+      border: 1px solid rgba(196,135,47,0.2);
+      pointer-events: none;
+      z-index: 2;
+    }
+    .about-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.8) saturate(0.85) sepia(0.15);
+      transition: transform 0.6s ease, filter 0.6s ease;
+    }
+    .about-frame:hover img {
+      transform: scale(1.03);
+      filter: brightness(0.85) saturate(0.9) sepia(0.1);
+    }
+    /* Warm vignette */
+    .about-frame::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 50%, rgba(13,10,7,0.5) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .about-badge {
+      position: absolute;
+      bottom: -1.5rem;
+      right: -1.5rem;
+      width: 110px;
+      height: 110px;
+      background: var(--amber);
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 1rem;
+      z-index: 3;
+    }
+    .about-badge strong {
+      font-family: var(--font-head);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--bg);
+      line-height: 1;
+    }
+    .about-badge span {
+      font-size: 0.6rem;
+      font-family: var(--font-head);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(13,10,7,0.7);
+    }
+
+    /* Secondary image tucked behind */
+    .about-secondary {
+      position: absolute;
+      top: -2rem;
+      right: -3rem;
+      width: 45%;
+      aspect-ratio: 1;
+      overflow: hidden;
+      border: 2px solid var(--walnut);
+      z-index: -1;
+    }
+    .about-secondary img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.5) saturate(0.5) sepia(0.3);
+    }
+
+    .about-text .label { margin-bottom: 1rem; }
+
+    .about-text h2 {
+      font-family: var(--font-head);
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      line-height: 1;
+      color: var(--parchment);
+      margin-bottom: 1.5rem;
+    }
+
+    .about-text p {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.8;
+      margin-bottom: 1.2rem;
+    }
+    .about-text p strong { color: var(--cream); font-weight: 500; }
+
+    .father-son {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--rule);
+    }
+    .person {
+      flex: 1;
+      padding: 1.2rem;
+      background: linear-gradient(135deg, var(--bg-2), var(--bg-3));
+      border: 1px solid var(--rule);
+    }
+    .person-role {
+      font-family: var(--font-head);
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 0.3rem;
+    }
+    .person-name {
+      font-family: var(--font-head);
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--parchment);
+    }
+
+    /* ─────────────────────────────────────────
+       SERVICES
+    ───────────────────────────────────────── */
+    #services {
+      padding: clamp(5rem, 10vw, 9rem) clamp(1.5rem, 6vw, 6rem);
+      background: var(--bg-2);
+    }
+
+    .services-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: end;
+      margin-bottom: 4rem;
+    }
+
+    .services-intro {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5px;
+      background: var(--rule);
+    }
+
+    .service-card {
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s;
+    }
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--amber);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+      z-index: 3;
+    }
+    .service-card:hover::before { transform: scaleX(1); }
+
+    .service-img {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4/3;
+      overflow: hidden;
+    }
+    .service-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.55) saturate(0.7) sepia(0.2);
+      transition: transform 0.5s ease, filter 0.5s ease;
+    }
+    .service-card:hover .service-img img {
+      transform: scale(1.06);
+      filter: brightness(0.65) saturate(0.8) sepia(0.15);
+    }
+    /* Gradient fade to content */
+    .service-img::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60%;
+      background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .service-body {
+      padding: 0 clamp(1.5rem, 3vw, 2rem) clamp(1.5rem, 3vw, 2rem);
+      position: relative;
+      margin-top: -2rem;
+      z-index: 2;
+    }
+
+    .service-number {
+      font-family: var(--font-head);
+      font-size: 4rem;
+      font-weight: 700;
+      color: var(--amber);
+      opacity: 0.08;
+      position: absolute;
+      top: -3.5rem;
+      right: 1.5rem;
+      line-height: 1;
+      z-index: 1;
+    }
+
+    .service-card h3 {
+      font-family: var(--font-head);
+      font-size: 1.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--parchment);
+      margin-bottom: 0.5rem;
+    }
+    .service-card p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.75;
+      margin-top: 0.75rem;
+    }
+    .service-tag {
+      display: inline-block;
+      margin-top: 1.2rem;
+      font-family: var(--font-head);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--amber);
+      border-bottom: 1px solid var(--amber);
+      padding-bottom: 2px;
+    }
+
+    /* ─────────────────────────────────────────
+       PROCESS
+    ───────────────────────────────────────── */
+    #process {
+      padding: clamp(5rem, 10vw, 9rem) clamp(1.5rem, 6vw, 6rem);
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: clamp(3rem, 6vw, 7rem);
+      align-items: start;
+    }
+
+    .process-sticky { position: sticky; top: 100px; }
+    .process-steps { display: flex; flex-direction: column; }
+
+    .step {
+      display: grid;
+      grid-template-columns: 60px 1fr;
+      gap: 1.5rem;
+      padding: 2rem 0;
+      border-top: 1px solid var(--rule);
+    }
+    .step:first-child { border-top: none; }
+
+    .step-num {
+      font-family: var(--font-head);
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--chestnut);
+      line-height: 1;
+      padding-top: 0.1rem;
+      transition: color 0.3s;
+    }
+    .step:hover .step-num { color: var(--amber); }
+
+    .step-content h4 {
+      font-family: var(--font-head);
+      font-size: 1.15rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--parchment);
+      margin-bottom: 0.5rem;
+    }
+    .step-content p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+
+    /* ─────────────────────────────────────────
+       GALLERY
+    ───────────────────────────────────────── */
+    #gallery {
+      padding: clamp(5rem, 10vw, 9rem) clamp(1.5rem, 6vw, 6rem);
+      background: var(--bg-2);
+    }
+
+    .gallery-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-auto-rows: minmax(200px, auto);
+      gap: 0.75rem;
+    }
+
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(196,135,47,0.12);
+      cursor: pointer;
+    }
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.7) saturate(0.75) sepia(0.12);
+      transition: transform 0.6s ease, filter 0.6s ease;
+    }
+    .gallery-item:hover img {
+      transform: scale(1.06);
+      filter: brightness(0.85) saturate(0.9) sepia(0.05);
+    }
+    /* Warm overlay on hover */
+    .gallery-item::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(13,10,7,0.7) 0%, transparent 50%);
+      opacity: 1;
+      transition: opacity 0.4s;
+      pointer-events: none;
+    }
+    .gallery-item:hover::after { opacity: 0.4; }
+
+    /* Caption overlay */
+    .gallery-caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 1rem 1.2rem;
+      z-index: 2;
+      transform: translateY(4px);
+      opacity: 0;
+      transition: transform 0.4s ease, opacity 0.4s ease;
+    }
+    .gallery-item:hover .gallery-caption {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .gallery-caption span {
+      font-family: var(--font-head);
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--parchment);
+    }
+    .gallery-caption em {
+      display: block;
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 0.8rem;
+      color: var(--amber-light);
+      margin-top: 0.2rem;
+    }
+
+    /* Grid layout per item */
+    .gi-1 { grid-column: span 5; grid-row: span 2; }
+    .gi-2 { grid-column: span 4; }
+    .gi-3 { grid-column: span 3; }
+    .gi-4 { grid-column: span 3; }
+    .gi-5 { grid-column: span 4; }
+    .gi-6 { grid-column: span 5; }
+    .gi-7 { grid-column: span 5; grid-row: span 2; }
+    .gi-8 { grid-column: span 4; }
+    .gi-9 { grid-column: span 3; }
+
+    /* ─────────────────────────────────────────
+       REVIEWS
+    ───────────────────────────────────────── */
+    #reviews {
+      padding: clamp(5rem, 10vw, 9rem) clamp(1.5rem, 6vw, 6rem);
+      position: relative;
+      overflow: hidden;
+    }
+    #reviews::before {
+      content: '\201C';
+      font-family: var(--font-serif);
+      font-size: 30rem;
+      color: var(--walnut);
+      position: absolute;
+      top: -5rem;
+      left: -3rem;
+      line-height: 1;
+      pointer-events: none;
+      opacity: 0.2;
+    }
+
+    .reviews-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+
+    .review-card {
+      background: linear-gradient(135deg, var(--bg-2), var(--bg-3));
+      border: 1px solid var(--rule);
+      padding: 2rem;
+      position: relative;
+    }
+    .review-card::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 2rem;
+      right: 2rem;
+      height: 2px;
+      background: linear-gradient(to right, var(--amber), transparent);
+    }
+
+    .review-stars {
+      display: flex;
+      gap: 3px;
+      margin-bottom: 1rem;
+    }
+    .review-stars svg { width: 14px; height: 14px; fill: var(--amber); }
+
+    .review-text {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 0.95rem;
+      color: var(--cream);
+      line-height: 1.75;
+      margin-bottom: 1.5rem;
+    }
+
+    .reviewer {
+      font-family: var(--font-head);
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--amber);
+    }
+
+    /* ─────────────────────────────────────────
+       FULL-WIDTH IMAGE BREAK
+    ───────────────────────────────────────── */
+    .image-break {
+      position: relative;
+      width: 100%;
+      height: 50vh;
+      min-height: 300px;
+      overflow: hidden;
+    }
+    .image-break img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.4) saturate(0.6) sepia(0.25);
+    }
+    .image-break::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to top, var(--bg-2) 0%, transparent 30%),
+        linear-gradient(to bottom, var(--bg) 0%, transparent 30%);
+    }
+    .image-break-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      text-align: center;
+      padding: 2rem;
+    }
+    .image-break-text .section-title { font-size: clamp(1.8rem, 4vw, 3rem); }
+    .image-break-text p {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 1.1rem;
+      color: var(--amber-light);
+      margin-top: 0.75rem;
+    }
+
+    /* ─────────────────────────────────────────
+       CONTACT
+    ───────────────────────────────────────── */
+    #contact {
+      background: var(--bg-2);
+      padding: clamp(5rem, 10vw, 9rem) clamp(1.5rem, 6vw, 6rem);
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(3rem, 6vw, 7rem);
+      align-items: start;
+    }
+
+    .contact-info .label { margin-bottom: 1rem; }
+
+    .contact-info h2 {
+      font-family: var(--font-head);
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      line-height: 1;
+      color: var(--parchment);
+      margin-bottom: 1.5rem;
+    }
+
+    .contact-info p {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.8;
+      max-width: 400px;
+      margin-bottom: 2.5rem;
+    }
+
+    .contact-details { display: flex; flex-direction: column; gap: 1rem; }
+
+    .contact-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1.2rem;
+      border: 1px solid var(--rule);
+      transition: border-color 0.3s;
+    }
+    .contact-item:hover { border-color: var(--amber); }
+
+    .contact-item-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--walnut);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .contact-item-icon svg { width: 18px; height: 18px; color: var(--amber); }
+
+    .contact-item-label {
+      font-family: var(--font-head);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 0.2rem;
+    }
+    .contact-item-value {
+      font-size: 0.95rem;
+      color: var(--cream);
+    }
+
+    .contact-form { display: flex; flex-direction: column; gap: 1rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+    .form-group label {
+      font-family: var(--font-head);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      background: var(--bg);
+      border: 1px solid var(--rule);
+      color: var(--cream);
+      padding: 0.85rem 1rem;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+    .form-group select option { background: var(--bg); }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-color: var(--amber); }
+    .form-group textarea { resize: vertical; min-height: 120px; }
+
+    /* ─────────────────────────────────────────
+       FOOTER
+    ───────────────────────────────────────── */
+    footer {
+      background: var(--bg);
+      border-top: 1px solid var(--rule);
+      padding: 3rem clamp(1.5rem, 6vw, 6rem);
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .footer-copy {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-family: var(--font-head);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .footer-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 0.5rem;
+    }
+    .footer-logo-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid var(--rule);
+    }
+    .footer-logo-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.8) saturate(0.7);
+    }
+    .footer-logo-name {
+      font-family: var(--font-head);
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .footer-right {
+      text-align: right;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-family: var(--font-head);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* ─────────────────────────────────────────
+       ANIMATIONS
+    ───────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeLeft {
+      from { opacity: 0; transform: translateX(24px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* ─────────────────────────────────────────
+       RESPONSIVE
+    ───────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      #about { grid-template-columns: 1fr; }
+      .about-visual { max-width: 420px; margin: 0 auto; }
+      .about-secondary { display: none; }
+      .services-header { grid-template-columns: 1fr; }
+      .services-grid { grid-template-columns: 1fr; }
+      #process { grid-template-columns: 1fr; }
+      .process-sticky { position: static; }
+      .reviews-grid { grid-template-columns: 1fr; }
+      .contact-grid { grid-template-columns: 1fr; }
+      footer { grid-template-columns: 1fr; text-align: center; }
+      .footer-right { text-align: center; }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links, .nav-cta { display: none; }
+      .hamburger { display: block; }
+      .hero-stats { display: none; }
+      .gallery-grid {
+        grid-template-columns: 1fr 1fr;
+        grid-auto-rows: 200px;
+      }
+      .gallery-item { grid-column: span 1 !important; grid-row: span 1 !important; }
+      .form-row { grid-template-columns: 1fr; }
+      .father-son { flex-direction: column; }
+    }
+
+    /* Mobile nav */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(13,10,7,0.97);
+      z-index: 90;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+    }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a {
+      font-family: var(--font-head);
+      font-size: 2rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--cream);
+    }
+    .mobile-nav a:hover { color: var(--amber); }
+  </style>
+</head>
+<body>
+
+  <!-- ─── MOBILE NAV ─── -->
+  <div class="mobile-nav" id="mobileNav">
+    <a href="#about" onclick="closeMobile()">About</a>
+    <a href="#services" onclick="closeMobile()">Services</a>
+    <a href="#process" onclick="closeMobile()">Process</a>
+    <a href="#gallery" onclick="closeMobile()">Gallery</a>
+    <a href="#contact" onclick="closeMobile()">Contact</a>
+  </div>
+
+  <!-- ─── NAV ─── -->
+  <nav id="navbar">
+    <a href="#" class="nav-logo">
+      <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 2 L14 10 L10 8 L13 14 L8 12 L12 18 L7 17 L11 22 L6 22 L11 26 L9 32 L18 29 L27 32 L25 26 L30 22 L25 22 L29 17 L24 18 L28 12 L23 14 L26 8 L22 10 Z" fill="#c4872f" opacity="0.9"/>
+        <rect x="16" y="28" width="4" height="6" fill="#c4872f" opacity="0.7"/>
+      </svg>
+      <div class="nav-logo-text">
+        <strong>Lonely Pines</strong>
+        <span>Taxidermy</span>
+      </div>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#process">Process</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+    </ul>
+
+    <a href="#contact" class="nav-cta">Get a Quote</a>
+
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ─── HERO ─── -->
+  <section id="hero">
+    <div class="hero-bg">
+      <img src="public/deer2.jpg" alt="Whitetail deer mount displayed outdoors in winter" />
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <span class="label">Freeport, Ohio · Father &amp; Son Team</span>
+      </div>
+      <h1 class="hero-title">
+        Lonely<br>Pines
+        <em>Taxidermy</em>
+      </h1>
+      <p class="hero-tagline">
+        Preserving memories, one mount at a time. We hold each trophy to the highest standards — ensuring the finest mount possible, every time.
+      </p>
+      <div class="hero-actions">
+        <a href="#contact" class="btn-primary">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h12v10H2z" opacity="0.2"/><path d="M1 1h14v12H1V1zm1 1v10h12V2H2zm2 3h8v1H4V5zm0 3h6v1H4V8z"/></svg>
+          Get a Free Quote
+        </a>
+        <a href="#services" class="btn-ghost">View Services</a>
+      </div>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-number">520+</div>
+        <div class="stat-label">Followers</div>
+      </div>
+      <div class="stat-rule"></div>
+      <div class="stat-item">
+        <div class="stat-number">5&#9733;</div>
+        <div class="stat-label">Reviews</div>
+      </div>
+      <div class="stat-rule"></div>
+      <div class="stat-item">
+        <div class="stat-number">3</div>
+        <div class="stat-label">Specialties</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── MARQUEE ─── -->
+  <div class="marquee-band">
+    <div class="marquee-inner">
+      <span>Deer Mounts <span class="marquee-dot">&#10022;</span></span>
+      <span>Turkey Mounts <span class="marquee-dot">&#10022;</span></span>
+      <span>Waterfowl <span class="marquee-dot">&#10022;</span></span>
+      <span>Father &amp; Son Shop <span class="marquee-dot">&#10022;</span></span>
+      <span>Freeport, Ohio <span class="marquee-dot">&#10022;</span></span>
+      <span>Trophy Quality <span class="marquee-dot">&#10022;</span></span>
+      <span>Deer Mounts <span class="marquee-dot">&#10022;</span></span>
+      <span>Turkey Mounts <span class="marquee-dot">&#10022;</span></span>
+      <span>Waterfowl <span class="marquee-dot">&#10022;</span></span>
+      <span>Father &amp; Son Shop <span class="marquee-dot">&#10022;</span></span>
+      <span>Freeport, Ohio <span class="marquee-dot">&#10022;</span></span>
+      <span>Trophy Quality <span class="marquee-dot">&#10022;</span></span>
+    </div>
+  </div>
+
+  <!-- ─── ABOUT ─── -->
+  <section id="about">
+    <div class="about-visual reveal">
+      <div class="about-secondary">
+        <img src="public/skull.jpg" alt="European skull mount" />
+      </div>
+      <div class="about-frame">
+        <img src="public/businesssign.jpg" alt="Lonely Pines Taxidermy metal shop sign" />
+      </div>
+      <div class="about-badge">
+        <strong>100%</strong>
+        <span>Quality Guaranteed</span>
+      </div>
+    </div>
+
+    <div class="about-text">
+      <span class="label reveal">Our Story</span>
+
+      <div class="ornament reveal reveal-delay-1">
+        <svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14 2 L11 8 L8 7 L10 12 L6 11 L9 15 L5 14 L8 18 L4 19 L8 21 L7 26 L14 24 L21 26 L20 21 L24 19 L20 18 L23 14 L19 15 L22 11 L18 12 L20 7 L17 8 Z"/>
+        </svg>
+      </div>
+
+      <h2 class="section-title reveal reveal-delay-1">
+        A Family<br>Built on<br><span class="serif-accent">Tradition</span>
+      </h2>
+
+      <p class="reveal reveal-delay-2">
+        Lonely Pines Taxidermy is a <strong>proudly family-run shop</strong> operated by a father-and-son team out of Freeport, Ohio. Every mount that walks through our door is treated with the same respect and craftsmanship we'd give our own trophies.
+      </p>
+      <p class="reveal reveal-delay-3">
+        We specialize in <strong>deer, turkey, and waterfowl</strong> — the animals that matter most to Ohio hunters. From the moment you bring us your harvest, we work with precision and care to capture the life and character of your animal in a lasting memorial.
+      </p>
+
+      <div class="father-son reveal reveal-delay-4">
+        <div class="person">
+          <div class="person-role">The Father</div>
+          <div class="person-name">The Experience</div>
+        </div>
+        <div class="person">
+          <div class="person-role">The Son</div>
+          <div class="person-name">The Passion</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SERVICES ─── -->
+  <section id="services">
+    <div class="services-header">
+      <div>
+        <span class="label reveal">What We Do</span>
+        <div class="ornament reveal reveal-delay-1">
+          <svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14 2 L11 8 L8 7 L10 12 L6 11 L9 15 L5 14 L8 18 L4 19 L8 21 L7 26 L14 24 L21 26 L20 21 L24 19 L20 18 L23 14 L19 15 L22 11 L18 12 L20 7 L17 8 Z"/>
+          </svg>
+        </div>
+        <h2 class="section-title reveal reveal-delay-1">Our<br>Specialties</h2>
+      </div>
+      <p class="services-intro reveal reveal-delay-2">
+        Every species demands its own technique. We've refined our craft around the animals that define the Ohio hunting season — delivering lifelike, lasting mounts you'll be proud to display.
+      </p>
+    </div>
+
+    <div class="services-grid">
+      <!-- Deer -->
+      <div class="service-card reveal">
+        <div class="service-img">
+          <img src="public/deer.jpg" alt="Whitetail deer shoulder mount" />
+        </div>
+        <div class="service-body">
+          <span class="service-number">01</span>
+          <h3>Deer</h3>
+          <p>Shoulder mounts, pedestal mounts, and full-body options. We capture the majestic presence of your buck — from form to antler tip — in stunning, lifelike detail.</p>
+          <span class="service-tag">Signature Service</span>
+        </div>
+      </div>
+
+      <!-- Turkey -->
+      <div class="service-card reveal reveal-delay-1">
+        <div class="service-img">
+          <img src="public/turkey.jpg" alt="Full strut turkey mount" />
+        </div>
+        <div class="service-body">
+          <span class="service-number">02</span>
+          <h3>Turkey</h3>
+          <p>Full-strut, fan displays, and flying positions. Your trophy gobbler deserves to be shown in all its glory — feathers fanned, beard proud, plumage preserved perfectly.</p>
+          <span class="service-tag">Fan Mounts Available</span>
+        </div>
+      </div>
+
+      <!-- Waterfowl -->
+      <div class="service-card reveal reveal-delay-2">
+        <div class="service-img">
+          <img src="public/duck2.jpg" alt="Mallard duck mount on branch" />
+        </div>
+        <div class="service-body">
+          <span class="service-number">03</span>
+          <h3>Waterfowl</h3>
+          <p>Ducks, pheasants, and other birds preserved in lifelike flying or resting poses. We capture vivid colors and textures that make each bird a one-of-a-kind display piece.</p>
+          <span class="service-tag">Landing &amp; Flying Poses</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── IMAGE BREAK ─── -->
+  <div class="image-break">
+    <img src="public/bear.jpg" alt="Black bear mount climbing a pine tree" />
+    <div class="image-break-text">
+      <h2 class="section-title">Beyond the Basics</h2>
+      <p>We also handle specialty and non-traditional mounts — just ask.</p>
+    </div>
+  </div>
+
+  <!-- ─── PROCESS ─── -->
+  <section id="process">
+    <div class="process-sticky">
+      <span class="label reveal">How It Works</span>
+      <div class="ornament reveal reveal-delay-1">
+        <svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14 2 L11 8 L8 7 L10 12 L6 11 L9 15 L5 14 L8 18 L4 19 L8 21 L7 26 L14 24 L21 26 L20 21 L24 19 L20 18 L23 14 L19 15 L22 11 L18 12 L20 7 L17 8 Z"/>
+        </svg>
+      </div>
+      <h2 class="section-title reveal reveal-delay-1">Our<br>Process</h2>
+      <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.8; margin-top: 1rem; max-width: 300px;" class="reveal reveal-delay-2">
+        From field to wall, we guide you through every step to ensure your mount exceeds expectations.
+      </p>
+    </div>
+
+    <div class="process-steps">
+      <div class="step reveal">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <h4>Bring In Your Trophy</h4>
+          <p>Drop off your harvest at our shop in Freeport, Ohio. We'll assess the animal, discuss your vision for the mount, and give you an honest timeline and quote.</p>
+        </div>
+      </div>
+      <div class="step reveal reveal-delay-1">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <h4>Choose Your Mount Style</h4>
+          <p>Pick from shoulder mounts, pedestal mounts, full-body mounts, flying poses, fan displays, and more. We'll help you choose the pose that best showcases your animal.</p>
+        </div>
+      </div>
+      <div class="step reveal reveal-delay-2">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <h4>Expert Preservation</h4>
+          <p>Our father-and-son team applies skilled techniques — careful skinning, fleshing, tanning, and form fitting — to ensure the mount is built to last a lifetime.</p>
+        </div>
+      </div>
+      <div class="step reveal reveal-delay-3">
+        <div class="step-num">04</div>
+        <div class="step-content">
+          <h4>Finishing Touches</h4>
+          <p>Eyes set, fur brushed, feathers aligned, paint work blended — we obsess over every detail until the mount looks exactly as it did in the field.</p>
+        </div>
+      </div>
+      <div class="step reveal reveal-delay-4">
+        <div class="step-num">05</div>
+        <div class="step-content">
+          <h4>Pick Up Your Memory</h4>
+          <p>When your mount is ready, we'll reach out. Come see it in person and take home a piece of your hunt preserved for generations.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── GALLERY ─── -->
+  <section id="gallery">
+    <div class="gallery-header">
+      <div>
+        <span class="label reveal">Recent Work</span>
+        <h2 class="section-title reveal reveal-delay-1">The<br>Trophy Room</h2>
+      </div>
+      <a href="#contact" class="btn-ghost reveal reveal-delay-2">Submit Your Trophy</a>
+    </div>
+
+    <div class="gallery-grid">
+      <div class="gallery-item gi-1 reveal">
+        <img src="public/deer.jpg" alt="Whitetail deer shoulder mount with scenic base" />
+        <div class="gallery-caption">
+          <span>Whitetail Shoulder Mount</span>
+          <em>Full scenic pedestal base</em>
+        </div>
+      </div>
+      <div class="gallery-item gi-2 reveal reveal-delay-1">
+        <img src="public/turkey2.jpg" alt="Full strut turkey mount on display" />
+        <div class="gallery-caption">
+          <span>Full Strut Gobbler</span>
+          <em>2025 Spring season</em>
+        </div>
+      </div>
+      <div class="gallery-item gi-3 reveal reveal-delay-2">
+        <img src="public/skull.jpg" alt="European skull mount with large antlers" />
+        <div class="gallery-caption">
+          <span>European Skull Mount</span>
+          <em>Classic clean finish</em>
+        </div>
+      </div>
+      <div class="gallery-item gi-4 reveal">
+        <img src="public/duck.jpg" alt="Pheasant mount with wings spread" />
+        <div class="gallery-caption">
+          <span>Pheasant in Flight</span>
+          <em>Wings spread display</em>
+        </div>
+      </div>
+      <div class="gallery-item gi-5 reveal reveal-delay-1">
+        <img src="public/bear.jpg" alt="Black bear mount climbing a tree" />
+        <div class="gallery-caption">
+          <span>Black Bear</span>
+          <em>Tree-climbing full body</em>
+        </div>
+      </div>
+      <div class="gallery-item gi-6 reveal reveal-delay-2">
+        <img src="public/duck2.jpg" alt="Mallard drake on driftwood branch" />
+        <div class="gallery-caption">
+          <span>Mallard Drake</span>
+          <em>Driftwood perch mount</em>
+        </div>
+      </div>
+      <div class="gallery-item gi-7 reveal">
+        <img src="public/deer2.jpg" alt="Trophy buck mount displayed outdoors in snow" />
+        <div class="gallery-caption">
+          <span>Trophy Whitetail Buck</span>
+          <em>Outdoor scenic display</em>
+        </div>
+      </div>
+      <div class="gallery-item gi-8 reveal reveal-delay-1">
+        <img src="public/turkey.jpg" alt="Turkey mount full strut on tree" />
+        <div class="gallery-caption">
+          <span>Gobbler Full Strut</span>
+          <em>Limb-hanger display</em>
+        </div>
+      </div>
+      <div class="gallery-item gi-9 reveal reveal-delay-2">
+        <img src="public/businesssign.jpg" alt="Lonely Pines Taxidermy shop sign" />
+        <div class="gallery-caption">
+          <span>The Shop</span>
+          <em>Freeport, Ohio</em>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── REVIEWS ─── -->
+  <section id="reviews">
+    <span class="label reveal">What Hunters Say</span>
+    <div class="ornament reveal reveal-delay-1">
+      <svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14 2 L11 8 L8 7 L10 12 L6 11 L9 15 L5 14 L8 18 L4 19 L8 21 L7 26 L14 24 L21 26 L20 21 L24 19 L20 18 L23 14 L19 15 L22 11 L18 12 L20 7 L17 8 Z"/>
+      </svg>
+    </div>
+    <h2 class="section-title reveal reveal-delay-1">
+      Trusted by<br><span class="serif-accent">Fellow Hunters</span>
+    </h2>
+
+    <div class="reviews-grid">
+      <div class="review-card reveal">
+        <div class="review-stars">
+          <svg viewBox="0 0 12 12"><polygon points="6,1 7.5,4.5 11,4.7 8.5,7 9.2,10.5 6,8.8 2.8,10.5 3.5,7 1,4.7 4.5,4.5"/></svg>
+          <svg viewBox="0 0 12 12"><polygon points="6,1 7.5,4.5 11,4.7 8.5,7 9.2,10.5 6,8.8 2.8,10.5 3.5,7 1,4.7 4.5,4.5"/></svg>
+          <svg viewBox="0 0 12 12"><polygon points="6,1 7.5,4.5 11,4.7 8.5,7 9.2,10.5 6,8.8 2.8,10.5 3.5,7 1,4.7 4.5,4.5"/></svg>
+          <svg viewBox="0 0 12 12"><polygon points="6,1 7.5,4.5 11,4.7 8.5,7 9.2,10.5 6,8.8 2.8,10.5 3.5,7 1,4.7 4.5,4.5"/></svg>
+          <svg viewBox="0 0 12 12"><polygon points="6,1 7.5,4.5 11,4.7 8.5,7 9.2,10.5 6,8.8 2.8,10.5 3.5,7 1,4.7 4.5,4.5"/></svg>
+        </div>
+        <p class="review-text">"Outstanding work on my 10-point buck. The attention to detail is unreal — looks exactly like it did standing in that field. Gobbler mounted up nicely too, definitely a limb hanger. Only shop I'll ever use."</p>
+        <span class="reviewer">— Colt Wheeler, 2025 Season</span>
+      </div>
+      <div class="review-card reveal reveal-delay-1">
+        <div class="review-stars">
+          <svg viewBox="0 0 12 12"><polygon points="6,1 7.5,4.5 11,4.7 8.5,7 9.2,10.5 6,8.8 2.8,10.5 3.5,7 1,4.7 4.5,4.5"/></svg>
+          <svg viewBox="0 0 12 12"><polygon points="6,1 7.5,4.5 11,4.7 8.5,7 9.2,10.5 6,8.8 2.8,10.5 3.5,7 1,4.7 4.5,4.5"/></svg>
+          <svg viewBox="0 0 12 12"><polygon points="6,1 7.5,4.5 11,4.7 8.5,7 9.2,10.5 6,8.8 2.8,10.5 3.5,7 1,4.7 4.5,4.5"/></svg>
+          <svg viewBox="0 0 12 12"><polygon points="6,1 7.5,4.5 11,4.7 8.5,7 9.2,10.5 6,8.8 2.8,10.5 3.5,7 1,4.7 4.5,4.5"/></svg>
+          <svg viewBox="0 0 12 12"><polygon points="6,1 7.5,4.5 11,4.7 8.5,7 9.2,10.5 6,8.8 2.8,10.5 3.5,7 1,4.7 4.5,4.5"/></svg>
+        </div>
+        <p class="review-text">"Took my duck in and they treated it like a prized possession. The father-and-son team really takes pride in what they do — you can tell this is more than just a job. Mount came out absolutely stunning."</p>
+        <span class="reviewer">— Ohio Waterfowler</span>
+      </div>
+      <div class="review-card reveal reveal-delay-2">
+        <div class="review-stars">
+          <svg viewBox="0 0 12 12"><polygon points="6,1 7.5,4.5 11,4.7 8.5,7 9.2,10.5 6,8.8 2.8,10.5 3.5,7 1,4.7 4.5,4.5"/></svg>
+          <svg viewBox="0 0 12 12"><polygon points="6,1 7.5,4.5 11,4.7 8.5,7 9.2,10.5 6,8.8 2.8,10.5 3.5,7 1,4.7 4.5,4.5"/></svg>
+          <svg viewBox="0 0 12 12"><polygon points="6,1 7.5,4.5 11,4.7 8.5,7 9.2,10.5 6,8.8 2.8,10.5 3.5,7 1,4.7 4.5,4.5"/></svg>
+          <svg viewBox="0 0 12 12"><polygon points="6,1 7.5,4.5 11,4.7 8.5,7 9.2,10.5 6,8.8 2.8,10.5 3.5,7 1,4.7 4.5,4.5"/></svg>
+          <svg viewBox="0 0 12 12"><polygon points="6,1 7.5,4.5 11,4.7 8.5,7 9.2,10.5 6,8.8 2.8,10.5 3.5,7 1,4.7 4.5,4.5"/></svg>
+        </div>
+        <p class="review-text">"Best taxidermist in the area, hands down. Fair pricing, honest timelines, and the quality speaks for itself. My turkey fan mount hangs in my living room and everyone who sees it asks who did the work."</p>
+        <span class="reviewer">— Harrison County Hunter</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── CONTACT ─── -->
+  <section id="contact">
+    <div class="contact-grid">
+      <div class="contact-info">
+        <span class="label reveal">Reach Us</span>
+        <div class="ornament reveal reveal-delay-1">
+          <svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14 2 L11 8 L8 7 L10 12 L6 11 L9 15 L5 14 L8 18 L4 19 L8 21 L7 26 L14 24 L21 26 L20 21 L24 19 L20 18 L23 14 L19 15 L22 11 L18 12 L20 7 L17 8 Z"/>
+          </svg>
+        </div>
+        <h2 class="section-title reveal reveal-delay-1">
+          Let's Talk<br><span class="serif-accent">Trophies</span>
+        </h2>
+        <p class="reveal reveal-delay-2">Ready to get a quote or drop off your animal? Get in touch — we'd love to hear about your hunt and discuss how to best preserve your memory.</p>
+
+        <div class="contact-details reveal reveal-delay-3">
+          <div class="contact-item">
+            <div class="contact-item-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.18 6.18l1.07-.97a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+            <div>
+              <div class="contact-item-label">Phone</div>
+              <div class="contact-item-value"><a href="tel:3183666186" style="color: var(--cream);">(318) 366-6186</a></div>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <div class="contact-item-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+            <div>
+              <div class="contact-item-label">Email</div>
+              <div class="contact-item-value"><a href="mailto:lonelypinestaxidermy@yahoo.com" style="color: var(--cream);">lonelypinestaxidermy@yahoo.com</a></div>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <div class="contact-item-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div>
+              <div class="contact-item-label">Location</div>
+              <div class="contact-item-value">78111 Anderson Road<br>Freeport, OH 43973</div>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <div class="contact-item-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+            </div>
+            <div>
+              <div class="contact-item-label">Hours</div>
+              <div class="contact-item-value">Always Open — Call Ahead</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <form class="contact-form reveal" onsubmit="handleSubmit(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Your Name</label>
+              <input type="text" id="name" placeholder="John Smith" required />
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input type="tel" id="phone" placeholder="(555) 000-0000" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" placeholder="you@example.com" />
+          </div>
+          <div class="form-group">
+            <label for="species">Type of Mount</label>
+            <select id="species">
+              <option value="">Select a species...</option>
+              <option>Whitetail Deer — Shoulder Mount</option>
+              <option>Whitetail Deer — Pedestal Mount</option>
+              <option>Whitetail Deer — Full Body</option>
+              <option>Whitetail Deer — European Skull</option>
+              <option>Turkey — Full Strut</option>
+              <option>Turkey — Fan Display</option>
+              <option>Waterfowl — Flying Pose</option>
+              <option>Waterfowl — Landing Pose</option>
+              <option>Pheasant — Wings Spread</option>
+              <option>Bear — Full Body</option>
+              <option>Other — Please describe</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="message">Tell Us About Your Hunt</label>
+            <textarea id="message" placeholder="Share details about your animal, any specific requests, or questions you have..."></textarea>
+          </div>
+          <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; border: none;">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h12v10H2z" opacity="0.2"/><path d="M1 1h14v12H1V1zm1 1v10h12V2H2zm2 3h8v1H4V5zm0 3h6v1H4V8z"/></svg>
+            Send Message
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ─── -->
+  <footer>
+    <div class="footer-copy">
+      &copy; 2025 Lonely Pines Taxidermy<br>
+      Freeport, Ohio
+    </div>
+
+    <div class="footer-logo">
+      <div class="footer-logo-img">
+        <img src="public/businesssign.jpg" alt="Lonely Pines Taxidermy" />
+      </div>
+      <span class="footer-logo-name">Lonely Pines Taxidermy</span>
+    </div>
+
+    <div class="footer-right">
+      (318) 366-6186<br>
+      lonelypinestaxidermy@yahoo.com
+    </div>
+  </footer>
+
+  <!-- ─── SCRIPTS ─── -->
+  <script>
+    // Nav scroll effect
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    // Mobile nav
+    const hamburger = document.getElementById('hamburger');
+    const mobileNav = document.getElementById('mobileNav');
+    hamburger.addEventListener('click', () => mobileNav.classList.toggle('open'));
+    function closeMobile() { mobileNav.classList.remove('open'); }
+
+    // Scroll reveal
+    const revealEls = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    revealEls.forEach(el => observer.observe(el));
+
+    // Form handler
+    function handleSubmit(e) {
+      e.preventDefault();
+      const btn = e.target.querySelector('button[type="submit"]');
+      btn.textContent = "Message Sent \u2014 We'll Be In Touch!";
+      btn.style.background = 'var(--forest)';
+      btn.disabled = true;
+      setTimeout(() => {
+        btn.innerHTML = '<svg viewBox="0 0 16 16" fill="currentColor" style="width:16px;height:16px"><path d="M2 2h12v10H2z" opacity="0.2"/><path d="M1 1h14v12H1V1zm1 1v10h12V2H2zm2 3h8v1H4V5zm0 3h6v1H4V8z"/></svg> Send Message';
+        btn.style.background = '';
+        btn.disabled = false;
+        e.target.reset();
+      }, 4000);
+    }
+
+    // Smooth parallax on hero image
+    window.addEventListener('scroll', () => {
+      const hero = document.getElementById('hero');
+      const heroImg = hero.querySelector('.hero-bg img');
+      if (heroImg) {
+        const scrolled = window.scrollY;
+        heroImg.style.transform = 'translateY(' + (scrolled * 0.25) + 'px) scale(1.05)';
+      }
+    });
+  </script>
+
+</body>
+</html>
