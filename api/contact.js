@@ -1,6 +1,4 @@
-import { Resend } from 'resend';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import sgMail from '@sendgrid/mail';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -14,9 +12,12 @@ export default async function handler(req, res) {
   }
 
   const toEmail = process.env.CONTACT_EMAIL;
-  if (!toEmail) {
-    return res.status(500).json({ error: 'Contact email not configured' });
+  const fromEmail = process.env.SENDGRID_FROM_EMAIL;
+  if (!toEmail || !fromEmail) {
+    return res.status(500).json({ error: 'Email not configured' });
   }
+
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
   const htmlBody = `
     <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; background: #1a1208; color: #e8d5b0; padding: 32px; border: 1px solid rgba(196,135,47,0.3);">
@@ -52,9 +53,9 @@ export default async function handler(req, res) {
   `;
 
   try {
-    await resend.emails.send({
-      from: 'Lonely Pines Taxidermy <onboarding@resend.dev>',
+    await sgMail.send({
       to: toEmail,
+      from: fromEmail,
       subject: `New Quote Request from ${name}${species ? ` — ${species}` : ''}`,
       html: htmlBody,
     });
