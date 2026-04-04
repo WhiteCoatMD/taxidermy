@@ -673,16 +673,44 @@
       loadGallery();
     }
 
+    // ── STATIC IMAGES (already on the site) ──
+    const staticImages = [
+      { id: 'static-1', url: 'public/Tripp/deer_moun_on_wall.jpg', category: 'deer', caption: 'Shoulder mount — wall display', static: true },
+      { id: 'static-2', url: 'public/Tripp/deer_with_base.jpg', category: 'deer', caption: 'Pedestal mount — whiskey barrel base', static: true },
+      { id: 'static-3', url: 'public/Tripp/deer_on_tree.jpg', category: 'deer', caption: 'Buck between pines', static: true },
+      { id: 'static-4', url: 'public/Tripp/deer_in_brush.jpg', category: 'deer', caption: 'Scene mount — brush box', static: true },
+      { id: 'static-5', url: 'public/Tripp/deer_mount.jpg', category: 'deer', caption: 'Buck on tree display', static: true },
+      { id: 'static-6', url: 'public/deer.jpg', category: 'deer', caption: 'Scenic shoulder mount', static: true },
+      { id: 'static-7', url: 'public/deer2.jpg', category: 'deer', caption: 'Outdoor snow display', static: true },
+      { id: 'static-8', url: 'public/skull.jpg', category: 'deer', caption: 'European skull mount', static: true },
+      { id: 'static-9', url: 'public/Tripp/custom_base.jpg', category: 'deer', caption: 'Custom barrel base with foliage', static: true },
+      { id: 'static-10', url: 'public/turkey-card.jpg', category: 'turkey', caption: 'Full strut — front view', static: true },
+      { id: 'static-11', url: 'public/Tripp/turkey_on_box_tree.jpg', category: 'turkey', caption: 'Gobbler on box — fan displayed', static: true },
+      { id: 'static-12', url: 'public/Tripp/turkey_on_limb.jpg', category: 'turkey', caption: 'Full strut on limb', static: true },
+      { id: 'static-13', url: 'public/turkey.jpg', category: 'turkey', caption: 'Gobbler on tree', static: true },
+      { id: 'static-14', url: 'public/turkey2.jpg', category: 'turkey', caption: 'Full strut on base', static: true },
+      { id: 'static-15', url: 'public/Tripp/duck_on_tree.jpg', category: 'duck', caption: 'Mallard on driftwood', static: true },
+      { id: 'static-16', url: 'public/Tripp/duck_on_limb.jpg', category: 'duck', caption: 'Mallard on branch — grass scene', static: true },
+      { id: 'static-17', url: 'public/Tripp/duck_in_flight.jpg', category: 'duck', caption: 'Pheasant in flight', static: true },
+      { id: 'static-18', url: 'public/Tripp/duck_in_flight (1).jpg', category: 'duck', caption: 'Canada goose in flight', static: true },
+      { id: 'static-19', url: 'public/duck2.jpg', category: 'duck', caption: 'Mallard on branch', static: true },
+      { id: 'static-20', url: 'public/duck.jpg', category: 'duck', caption: 'Pheasant wings spread', static: true },
+      { id: 'static-21', url: 'public/Tripp/bear_on_tree3.jpg', category: 'bear', caption: 'Bear climbing pine', static: true },
+      { id: 'static-22', url: 'public/Tripp/bear_on_limb.jpg', category: 'bear', caption: 'Bear on branch', static: true },
+      { id: 'static-23', url: 'public/bear.jpg', category: 'bear', caption: 'Bear on tree — original', static: true },
+    ];
+
     // ── GALLERY MANAGEMENT ──
     async function loadGallery() {
+      let uploaded = [];
       try {
         const res = await fetch('/api/gallery');
-        galleryData = await res.json();
-        renderManageGrid();
-      } catch {
-        galleryData = [];
-        renderManageGrid();
-      }
+        uploaded = await res.json();
+      } catch { uploaded = []; }
+
+      // Uploaded (dynamic) first, then static
+      galleryData = [...uploaded.map(e => ({ ...e, static: false })), ...staticImages];
+      renderManageGrid();
     }
 
     function filterGallery(filter, btnEl) {
@@ -708,13 +736,13 @@
 
       empty.style.display = 'none';
       grid.innerHTML = filtered.map(entry => `
-        <div class="manage-item">
+        <div class="manage-item" style="${entry.static ? 'opacity:0.75;' : ''}">
           <img src="${entry.url}" alt="${entry.caption || entry.category}" loading="lazy" />
           <div class="manage-item-info">
-            <div class="manage-item-category">${entry.category === 'other' ? (entry.customCategory || 'Other') : entry.category}</div>
+            <div class="manage-item-category">${entry.category === 'other' ? (entry.customCategory || 'Other') : entry.category}${entry.static ? ' <span style="opacity:0.5;">· built-in</span>' : ''}</div>
             ${entry.caption ? `<div class="manage-item-caption">${entry.caption}</div>` : ''}
           </div>
-          <button class="manage-item-delete" onclick="deleteImage('${entry.id}')" title="Delete">\u00D7</button>
+          ${entry.static ? '' : `<button class="manage-item-delete" onclick="deleteImage('${entry.id}')" title="Delete">\u00D7</button>`}
         </div>
       `).join('');
     }
