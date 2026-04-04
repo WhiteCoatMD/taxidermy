@@ -1683,18 +1683,51 @@
     revealEls.forEach(el => observer.observe(el));
 
     // Form handler
-    function handleSubmit(e) {
+    async function handleSubmit(e) {
       e.preventDefault();
       const btn = e.target.querySelector('button[type="submit"]');
-      btn.textContent = "Message Sent \u2014 We'll Be In Touch!";
-      btn.style.background = 'var(--forest)';
+      const originalHTML = btn.innerHTML;
+
+      btn.textContent = 'Sending...';
+      btn.style.background = 'var(--chestnut)';
       btn.disabled = true;
-      setTimeout(() => {
-        btn.innerHTML = '<svg viewBox="0 0 16 16" fill="currentColor" style="width:16px;height:16px"><path d="M2 2h12v10H2z" opacity="0.2"/><path d="M1 1h14v12H1V1zm1 1v10h12V2H2zm2 3h8v1H4V5zm0 3h6v1H4V8z"/></svg> Send Message';
-        btn.style.background = '';
-        btn.disabled = false;
-        e.target.reset();
-      }, 4000);
+
+      const data = {
+        name: document.getElementById('name').value,
+        phone: document.getElementById('phone').value,
+        email: document.getElementById('email').value,
+        species: document.getElementById('species').value,
+        message: document.getElementById('message').value,
+      };
+
+      try {
+        const res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        if (res.ok) {
+          btn.textContent = "Message Sent \u2014 We'll Be In Touch!";
+          btn.style.background = 'var(--forest)';
+          e.target.reset();
+          setTimeout(() => {
+            btn.innerHTML = originalHTML;
+            btn.style.background = '';
+            btn.disabled = false;
+          }, 5000);
+        } else {
+          throw new Error('Send failed');
+        }
+      } catch (err) {
+        btn.textContent = 'Something went wrong \u2014 try calling us!';
+        btn.style.background = '#8b3a3a';
+        setTimeout(() => {
+          btn.innerHTML = originalHTML;
+          btn.style.background = '';
+          btn.disabled = false;
+        }, 4000);
+      }
     }
 
     // Smooth parallax on hero image
