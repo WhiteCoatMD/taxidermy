@@ -708,6 +708,8 @@
         uploaded = await res.json();
       } catch { uploaded = []; }
 
+      await loadHidden();
+
       // Uploaded (dynamic) first, then static
       galleryData = [...uploaded.map(e => ({ ...e, static: false })), ...staticImages];
       renderManageGrid();
@@ -718,6 +720,15 @@
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       btnEl.classList.add('active');
       renderManageGrid();
+    }
+
+    let hiddenIds = [];
+
+    async function loadHidden() {
+      try {
+        const res = await fetch('/api/hide');
+        hiddenIds = await res.json();
+      } catch { hiddenIds = []; }
     }
 
     function renderManageGrid() {
@@ -735,16 +746,54 @@
       }
 
       empty.style.display = 'none';
-      grid.innerHTML = filtered.map(entry => `
-        <div class="manage-item" style="${entry.static ? 'opacity:0.75;' : ''}">
+      grid.innerHTML = filtered.map(entry => {
+        const isHidden = hiddenIds.includes(entry.id);
+        return `
+        <div class="manage-item" style="${isHidden ? 'opacity:0.3;' : ''}">
           <img src="${entry.url}" alt="${entry.caption || entry.category}" loading="lazy" />
           <div class="manage-item-info">
-            <div class="manage-item-category">${entry.category === 'other' ? (entry.customCategory || 'Other') : entry.category}${entry.static ? ' <span style="opacity:0.5;">· built-in</span>' : ''}</div>
+            <div class="manage-item-category">${entry.category === 'other' ? (entry.customCategory || 'Other') : entry.category}${isHidden ? ' <span style="color:var(--danger);">· hidden</span>' : ''}</div>
             ${entry.caption ? `<div class="manage-item-caption">${entry.caption}</div>` : ''}
           </div>
-          ${entry.static ? '' : `<button class="manage-item-delete" onclick="deleteImage('${entry.id}')" title="Delete">\u00D7</button>`}
-        </div>
-      `).join('');
+          ${entry.static
+            ? (isHidden
+              ? `<button class="manage-item-delete" onclick="unhideStaticImage('${entry.id}')" title="Show on site" style="background:var(--forest);">+</button>`
+              : `<button class="manage-item-delete" onclick="hideStaticImage('${entry.id}')" title="Hide from site">\u00D7</button>`)
+            : `<button class="manage-item-delete" onclick="deleteImage('${entry.id}')" title="Delete">\u00D7</button>`
+          }
+        </div>`;
+      }).join('');
+    }
+
+    async function hideStaticImage(id) {
+      if (!confirm('Hide this image from the live site?')) return;
+      try {
+        const res = await fetch('/api/hide', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id }),
+        });
+        if (res.ok) {
+          hiddenIds.push(id);
+          renderManageGrid();
+          showToast('Image hidden from site');
+        } else { showToast('Failed to hide', true); }
+      } catch { showToast('Failed to hide', true); }
+    }
+
+    async function unhideStaticImage(id) {
+      try {
+        const res = await fetch('/api/hide', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, action: 'unhide' }),
+        });
+        if (res.ok) {
+          hiddenIds = hiddenIds.filter(h => h !== id);
+          renderManageGrid();
+          showToast('Image restored to site');
+        } else { showToast('Failed to restore', true); }
+      } catch { showToast('Failed to restore', true); }
     }
 
     async function deleteImage(id) {
