@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Admin password not configured' });
   }
 
-  if (password !== process.env.ADMIN_PASSWORD) {
+  if (String(password).trim() !== String(process.env.ADMIN_PASSWORD).trim()) {
     return res.status(401).json({ error: 'Invalid password' });
   }
 
