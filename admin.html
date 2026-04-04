@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Lonely Pines Taxidermy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0d0a07;
+      --bg-2: #160f08;
+      --bg-3: #1e1509;
+      --walnut: #2e1f0e;
+      --chestnut: #4a2f18;
+      --amber: #c4872f;
+      --amber-light: #e0a84a;
+      --forest: #4a6840;
+      --cream: #e8d5b0;
+      --parchment: #f5ede0;
+      --muted: #7a6a54;
+      --rule: rgba(196,135,47,0.25);
+      --danger: #8b3a3a;
+      --font-head: 'Oswald', sans-serif;
+      --font-body: 'Lora', serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+
+    body {
+      background: var(--bg);
+      color: var(--cream);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ── LOGIN SCREEN ── */
+    .login-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .login-logo {
+      font-family: var(--font-head);
+      font-size: 1.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--parchment);
+      margin-bottom: 0.3rem;
+    }
+    .login-sub {
+      font-size: 0.75rem;
+      color: var(--amber);
+      font-family: var(--font-head);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+    }
+
+    .login-form {
+      width: 100%;
+      max-width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .login-form input {
+      background: var(--bg-2);
+      border: 1px solid var(--rule);
+      color: var(--cream);
+      padding: 0.9rem 1rem;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      text-align: center;
+      outline: none;
+    }
+    .login-form input:focus { border-color: var(--amber); }
+    .login-form input::placeholder { color: var(--muted); }
+
+    .login-error {
+      color: var(--danger);
+      font-size: 0.85rem;
+      text-align: center;
+      display: none;
+    }
+
+    /* ── SHARED BUTTON ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-family: var(--font-head);
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.85rem 1.5rem;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--amber); color: var(--bg); }
+    .btn-primary:hover { background: var(--amber-light); }
+    .btn-danger { background: var(--danger); color: var(--cream); }
+    .btn-danger:hover { background: #a04545; }
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--rule);
+      color: var(--cream);
+    }
+
+    /* ── ADMIN PANEL ── */
+    .admin-panel { display: none; }
+
+    .admin-header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 10;
+    }
+    .admin-title {
+      font-family: var(--font-head);
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--parchment);
+    }
+    .admin-title span { color: var(--amber); }
+
+    /* ── UPLOAD SECTION ── */
+    .upload-section {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--rule);
+    }
+    .section-label {
+      font-family: var(--font-head);
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 1rem;
+    }
+
+    /* Drop zone / file picker */
+    .upload-zone {
+      border: 2px dashed var(--rule);
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 1rem;
+    }
+    .upload-zone:hover,
+    .upload-zone.dragover {
+      border-color: var(--amber);
+      background: rgba(196,135,47,0.05);
+    }
+    .upload-zone-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      opacity: 0.6;
+    }
+    .upload-zone-text {
+      font-family: var(--font-head);
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .upload-zone-text strong { color: var(--amber); }
+
+    #fileInput { display: none; }
+
+    /* Image previews */
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .preview-item {
+      position: relative;
+      aspect-ratio: 1;
+      border: 1px solid var(--rule);
+      overflow: hidden;
+    }
+    .preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .preview-remove {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 22px;
+      height: 22px;
+      background: rgba(139,58,58,0.9);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 14px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Upload form fields */
+    .upload-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .field-group { display: flex; flex-direction: column; gap: 0.3rem; }
+    .field-group label {
+      font-family: var(--font-head);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .field-group select,
+    .field-group input,
+    .field-group textarea {
+      background: var(--bg-2);
+      border: 1px solid var(--rule);
+      color: var(--cream);
+      padding: 0.75rem 0.85rem;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    .field-group select option { background: var(--bg-2); }
+    .field-group select:focus,
+    .field-group input:focus,
+    .field-group textarea:focus { border-color: var(--amber); }
+
+    .other-field { display: none; }
+    .other-field.visible { display: flex; }
+
+    .upload-status {
+      margin-top: 0.75rem;
+      font-size: 0.85rem;
+      color: var(--amber);
+      font-family: var(--font-head);
+      letter-spacing: 0.1em;
+      text-align: center;
+      display: none;
+    }
+
+    /* Progress bar */
+    .progress-bar {
+      display: none;
+      height: 3px;
+      background: var(--walnut);
+      margin-top: 0.5rem;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--amber);
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    /* ── GALLERY MANAGEMENT ── */
+    .manage-section {
+      padding: 1.5rem;
+    }
+
+    .manage-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      font-family: var(--font-head);
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.5rem 1rem;
+      background: transparent;
+      border: 1px solid var(--rule);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: var(--amber);
+      border-color: var(--amber);
+      color: var(--bg);
+    }
+
+    .manage-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .manage-item {
+      position: relative;
+      background: var(--bg-2);
+      border: 1px solid var(--rule);
+      overflow: hidden;
+    }
+    .manage-item img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      display: block;
+      filter: brightness(0.85);
+    }
+    .manage-item-info {
+      padding: 0.6rem;
+    }
+    .manage-item-category {
+      font-family: var(--font-head);
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--amber);
+    }
+    .manage-item-caption {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.2rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .manage-item-delete {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 28px;
+      height: 28px;
+      background: rgba(139,58,58,0.85);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .manage-item:hover .manage-item-delete { opacity: 1; }
+
+    /* Always show delete on mobile (no hover) */
+    @media (hover: none) {
+      .manage-item-delete { opacity: 1; }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--muted);
+      font-family: var(--font-head);
+      font-size: 0.8rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--forest);
+      color: var(--cream);
+      font-family: var(--font-head);
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.8rem 1.5rem;
+      z-index: 100;
+      transition: transform 0.3s ease;
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.error { background: var(--danger); }
+  </style>
+</head>
+<body>
+
+  <!-- ── LOGIN ── -->
+  <div class="login-screen" id="loginScreen">
+    <div class="login-logo">Lonely Pines</div>
+    <div class="login-sub">Admin Panel</div>
+    <form class="login-form" onsubmit="handleLogin(event)">
+      <input type="password" id="passwordInput" placeholder="Enter password" autocomplete="current-password" />
+      <div class="login-error" id="loginError">Incorrect password</div>
+      <button type="submit" class="btn btn-primary" style="width:100%;">Log In</button>
+    </form>
+  </div>
+
+  <!-- ── ADMIN PANEL ── -->
+  <div class="admin-panel" id="adminPanel">
+
+    <header class="admin-header">
+      <div class="admin-title"><span>LP</span> Admin</div>
+      <button class="btn btn-ghost" onclick="logout()" style="padding:0.5rem 1rem; font-size:0.65rem;">Log Out</button>
+    </header>
+
+    <!-- Upload Section -->
+    <div class="upload-section">
+      <div class="section-label">Upload New Mount Photos</div>
+
+      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+        <div class="upload-zone-icon">&#128247;</div>
+        <div class="upload-zone-text">Tap to <strong>take a photo</strong> or choose from gallery</div>
+      </div>
+      <input type="file" id="fileInput" accept="image/*" multiple capture="environment" />
+
+      <div class="preview-grid" id="previewGrid"></div>
+
+      <div class="upload-fields">
+        <div class="field-group">
+          <label for="categorySelect">Category</label>
+          <select id="categorySelect" onchange="toggleOther()">
+            <option value="deer">Deer</option>
+            <option value="turkey">Turkey</option>
+            <option value="duck">Duck</option>
+            <option value="bear">Bear</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="field-group other-field" id="otherField">
+          <label for="customCategory">Specify Type</label>
+          <input type="text" id="customCategory" placeholder="e.g. Pheasant, Elk, Coyote..." />
+        </div>
+
+        <div class="field-group">
+          <label for="captionInput">Caption (optional)</label>
+          <input type="text" id="captionInput" placeholder="e.g. 10-point buck, 2025 season" />
+        </div>
+
+        <button class="btn btn-primary" id="uploadBtn" onclick="handleUpload()" style="width:100%;" disabled>
+          Upload Photos
+        </button>
+
+        <div class="progress-bar" id="progressBar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="upload-status" id="uploadStatus"></div>
+      </div>
+    </div>
+
+    <!-- Gallery Management -->
+    <div class="manage-section">
+      <div class="section-label">Manage Gallery</div>
+
+      <div class="manage-tabs" id="manageTabs">
+        <button class="tab-btn active" data-filter="all" onclick="filterGallery('all', this)">All</button>
+        <button class="tab-btn" data-filter="deer" onclick="filterGallery('deer', this)">Deer</button>
+        <button class="tab-btn" data-filter="turkey" onclick="filterGallery('turkey', this)">Turkey</button>
+        <button class="tab-btn" data-filter="duck" onclick="filterGallery('duck', this)">Duck</button>
+        <button class="tab-btn" data-filter="bear" onclick="filterGallery('bear', this)">Bear</button>
+        <button class="tab-btn" data-filter="other" onclick="filterGallery('other', this)">Other</button>
+      </div>
+
+      <div class="manage-grid" id="manageGrid"></div>
+      <div class="empty-state" id="emptyState" style="display:none;">No images uploaded yet</div>
+    </div>
+
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let selectedFiles = [];
+    let galleryData = [];
+    let currentFilter = 'all';
+
+    // ── AUTH ──
+    async function handleLogin(e) {
+      e.preventDefault();
+      const pw = document.getElementById('passwordInput').value;
+      const errEl = document.getElementById('loginError');
+      errEl.style.display = 'none';
+
+      try {
+        const res = await fetch('/api/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: pw }),
+        });
+
+        if (res.ok) {
+          document.getElementById('loginScreen').style.display = 'none';
+          document.getElementById('adminPanel').style.display = 'block';
+          loadGallery();
+        } else {
+          errEl.style.display = 'block';
+        }
+      } catch {
+        errEl.textContent = 'Connection error';
+        errEl.style.display = 'block';
+      }
+    }
+
+    function logout() {
+      document.cookie = 'admin_token=; Path=/; Max-Age=0';
+      location.reload();
+    }
+
+    // ── FILE SELECTION ──
+    const fileInput = document.getElementById('fileInput');
+    const uploadZone = document.getElementById('uploadZone');
+
+    fileInput.addEventListener('change', (e) => {
+      addFiles(Array.from(e.target.files));
+    });
+
+    uploadZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadZone.classList.add('dragover');
+    });
+    uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadZone.classList.remove('dragover');
+      addFiles(Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')));
+    });
+
+    function addFiles(files) {
+      selectedFiles.push(...files);
+      renderPreviews();
+      document.getElementById('uploadBtn').disabled = selectedFiles.length === 0;
+    }
+
+    function removeFile(index) {
+      selectedFiles.splice(index, 1);
+      renderPreviews();
+      document.getElementById('uploadBtn').disabled = selectedFiles.length === 0;
+    }
+
+    function renderPreviews() {
+      const grid = document.getElementById('previewGrid');
+      grid.innerHTML = '';
+      selectedFiles.forEach((file, i) => {
+        const div = document.createElement('div');
+        div.className = 'preview-item';
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(file);
+        const btn = document.createElement('button');
+        btn.className = 'preview-remove';
+        btn.textContent = '\u00D7';
+        btn.onclick = () => removeFile(i);
+        div.appendChild(img);
+        div.appendChild(btn);
+        grid.appendChild(div);
+      });
+    }
+
+    function toggleOther() {
+      const sel = document.getElementById('categorySelect').value;
+      document.getElementById('otherField').classList.toggle('visible', sel === 'other');
+    }
+
+    // ── IMAGE COMPRESSION ──
+    function compressImage(file, maxDim = 1400, quality = 0.78) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let w = img.width, h = img.height;
+            if (w > maxDim || h > maxDim) {
+              if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+              else { w = Math.round(w * maxDim / h); h = maxDim; }
+            }
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // ── UPLOAD ──
+    async function handleUpload() {
+      if (selectedFiles.length === 0) return;
+
+      const btn = document.getElementById('uploadBtn');
+      const status = document.getElementById('uploadStatus');
+      const progressBar = document.getElementById('progressBar');
+      const progressFill = document.getElementById('progressFill');
+      const category = document.getElementById('categorySelect').value;
+      const customCategory = document.getElementById('customCategory').value;
+      const caption = document.getElementById('captionInput').value;
+
+      btn.disabled = true;
+      btn.textContent = 'Uploading...';
+      status.style.display = 'block';
+      progressBar.style.display = 'block';
+
+      const total = selectedFiles.length;
+      let done = 0;
+
+      for (const file of selectedFiles) {
+        status.textContent = `Uploading ${done + 1} of ${total}...`;
+        progressFill.style.width = `${(done / total) * 100}%`;
+
+        try {
+          const compressed = await compressImage(file);
+          await fetch('/api/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              image: compressed,
+              filename: file.name,
+              category,
+              customCategory,
+              caption,
+            }),
+          });
+          done++;
+        } catch (err) {
+          showToast(`Failed to upload ${file.name}`, true);
+        }
+      }
+
+      progressFill.style.width = '100%';
+
+      // Reset
+      selectedFiles = [];
+      renderPreviews();
+      document.getElementById('captionInput').value = '';
+      document.getElementById('customCategory').value = '';
+
+      setTimeout(() => {
+        btn.textContent = 'Upload Photos';
+        btn.disabled = true;
+        status.style.display = 'none';
+        progressBar.style.display = 'none';
+        progressFill.style.width = '0%';
+      }, 1500);
+
+      showToast(`${done} photo${done !== 1 ? 's' : ''} uploaded!`);
+      loadGallery();
+    }
+
+    // ── GALLERY MANAGEMENT ──
+    async function loadGallery() {
+      try {
+        const res = await fetch('/api/gallery');
+        galleryData = await res.json();
+        renderManageGrid();
+      } catch {
+        galleryData = [];
+        renderManageGrid();
+      }
+    }
+
+    function filterGallery(filter, btnEl) {
+      currentFilter = filter;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btnEl.classList.add('active');
+      renderManageGrid();
+    }
+
+    function renderManageGrid() {
+      const grid = document.getElementById('manageGrid');
+      const empty = document.getElementById('emptyState');
+
+      const filtered = currentFilter === 'all'
+        ? galleryData
+        : galleryData.filter(e => e.category === currentFilter);
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+
+      empty.style.display = 'none';
+      grid.innerHTML = filtered.map(entry => `
+        <div class="manage-item">
+          <img src="${entry.url}" alt="${entry.caption || entry.category}" loading="lazy" />
+          <div class="manage-item-info">
+            <div class="manage-item-category">${entry.category === 'other' ? (entry.customCategory || 'Other') : entry.category}</div>
+            ${entry.caption ? `<div class="manage-item-caption">${entry.caption}</div>` : ''}
+          </div>
+          <button class="manage-item-delete" onclick="deleteImage('${entry.id}')" title="Delete">\u00D7</button>
+        </div>
+      `).join('');
+    }
+
+    async function deleteImage(id) {
+      if (!confirm('Delete this image? It will be removed from the live site.')) return;
+
+      try {
+        const res = await fetch('/api/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id }),
+        });
+
+        if (res.ok) {
+          showToast('Image deleted');
+          loadGallery();
+        } else {
+          showToast('Delete failed', true);
+        }
+      } catch {
+        showToast('Delete failed', true);
+      }
+    }
+
+    // ── TOAST ──
+    function showToast(msg, isError = false) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.className = 'toast' + (isError ? ' error' : '');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+  </script>
+</body>
+</html>

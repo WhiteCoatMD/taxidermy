@@ -1416,70 +1416,82 @@
       <a href="#contact" class="btn-ghost reveal reveal-delay-2">Submit Your Trophy</a>
     </div>
 
-    <div class="gallery-grid">
-      <div class="gallery-item gi-1 reveal">
+    <!-- Filter tabs -->
+    <div class="gallery-filters" style="display:flex; gap:0.5rem; margin-bottom:2rem; flex-wrap:wrap;">
+      <button class="gallery-filter active" data-filter="all" onclick="filterMain('all',this)" style="font-family:var(--font-head);font-size:0.7rem;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;padding:0.45rem 1rem;background:var(--amber);border:1px solid var(--amber);color:var(--bg);cursor:pointer;transition:all 0.2s;">All</button>
+      <button class="gallery-filter" data-filter="deer" onclick="filterMain('deer',this)" style="font-family:var(--font-head);font-size:0.7rem;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;padding:0.45rem 1rem;background:transparent;border:1px solid var(--rule);color:var(--muted);cursor:pointer;transition:all 0.2s;">Deer</button>
+      <button class="gallery-filter" data-filter="turkey" onclick="filterMain('turkey',this)" style="font-family:var(--font-head);font-size:0.7rem;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;padding:0.45rem 1rem;background:transparent;border:1px solid var(--rule);color:var(--muted);cursor:pointer;transition:all 0.2s;">Turkey</button>
+      <button class="gallery-filter" data-filter="duck" onclick="filterMain('duck',this)" style="font-family:var(--font-head);font-size:0.7rem;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;padding:0.45rem 1rem;background:transparent;border:1px solid var(--rule);color:var(--muted);cursor:pointer;transition:all 0.2s;">Duck</button>
+      <button class="gallery-filter" data-filter="bear" onclick="filterMain('bear',this)" style="font-family:var(--font-head);font-size:0.7rem;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;padding:0.45rem 1rem;background:transparent;border:1px solid var(--rule);color:var(--muted);cursor:pointer;transition:all 0.2s;">Bear</button>
+      <button class="gallery-filter" data-filter="other" onclick="filterMain('other',this)" style="font-family:var(--font-head);font-size:0.7rem;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;padding:0.45rem 1rem;background:transparent;border:1px solid var(--rule);color:var(--muted);cursor:pointer;transition:all 0.2s;">Other</button>
+    </div>
+
+    <div class="gallery-grid" id="galleryGrid">
+      <!-- Static items (always shown unless filtered out) -->
+      <div class="gallery-item gi-1 reveal" data-category="deer">
         <img src="public/deer.jpg" alt="Whitetail deer shoulder mount with scenic base" />
         <div class="gallery-caption">
           <span>Whitetail Shoulder Mount</span>
           <em>Full scenic pedestal base</em>
         </div>
       </div>
-      <div class="gallery-item gi-2 reveal reveal-delay-1">
+      <div class="gallery-item gi-2 reveal reveal-delay-1" data-category="turkey">
         <img src="public/turkey2.jpg" alt="Full strut turkey mount on display" />
         <div class="gallery-caption">
           <span>Full Strut Gobbler</span>
           <em>2025 Spring season</em>
         </div>
       </div>
-      <div class="gallery-item gi-3 reveal reveal-delay-2">
+      <div class="gallery-item gi-3 reveal reveal-delay-2" data-category="deer">
         <img src="public/skull.jpg" alt="European skull mount with large antlers" />
         <div class="gallery-caption">
           <span>European Skull Mount</span>
           <em>Classic clean finish</em>
         </div>
       </div>
-      <div class="gallery-item gi-4 reveal">
+      <div class="gallery-item gi-4 reveal" data-category="other">
         <img src="public/duck.jpg" alt="Pheasant mount with wings spread" />
         <div class="gallery-caption">
           <span>Pheasant in Flight</span>
           <em>Wings spread display</em>
         </div>
       </div>
-      <div class="gallery-item gi-5 reveal reveal-delay-1">
+      <div class="gallery-item gi-5 reveal reveal-delay-1" data-category="bear">
         <img src="public/bear.jpg" alt="Black bear mount climbing a tree" />
         <div class="gallery-caption">
           <span>Black Bear</span>
           <em>Tree-climbing full body</em>
         </div>
       </div>
-      <div class="gallery-item gi-6 reveal reveal-delay-2">
+      <div class="gallery-item gi-6 reveal reveal-delay-2" data-category="duck">
         <img src="public/duck2.jpg" alt="Mallard drake on driftwood branch" />
         <div class="gallery-caption">
           <span>Mallard Drake</span>
           <em>Driftwood perch mount</em>
         </div>
       </div>
-      <div class="gallery-item gi-7 reveal">
+      <div class="gallery-item gi-7 reveal" data-category="deer">
         <img src="public/deer2.jpg" alt="Trophy buck mount displayed outdoors in snow" />
         <div class="gallery-caption">
           <span>Trophy Whitetail Buck</span>
           <em>Outdoor scenic display</em>
         </div>
       </div>
-      <div class="gallery-item gi-8 reveal reveal-delay-1">
+      <div class="gallery-item gi-8 reveal reveal-delay-1" data-category="turkey">
         <img src="public/turkey.jpg" alt="Turkey mount full strut on tree" />
         <div class="gallery-caption">
           <span>Gobbler Full Strut</span>
           <em>Limb-hanger display</em>
         </div>
       </div>
-      <div class="gallery-item gi-9 reveal reveal-delay-2">
+      <div class="gallery-item gi-9 reveal reveal-delay-2" data-category="shop">
         <img src="public/businesssign.jpg" alt="Lonely Pines Taxidermy shop sign" />
         <div class="gallery-caption">
           <span>The Shop</span>
           <em>Freeport, Ohio</em>
         </div>
       </div>
+      <!-- Dynamic uploads injected here by JS -->
     </div>
   </section>
 
@@ -1739,6 +1751,76 @@
         heroImg.style.transform = 'translateY(' + (scrolled * 0.25) + 'px) scale(1.05)';
       }
     });
+
+    // ── DYNAMIC GALLERY ──
+    const gridSizes = ['gi-4','gi-5','gi-3','gi-5','gi-4','gi-3','gi-7','gi-3','gi-4','gi-5'];
+    let galleryUploads = [];
+
+    async function loadDynamicGallery() {
+      try {
+        const res = await fetch('/api/gallery');
+        if (!res.ok) return;
+        galleryUploads = await res.json();
+        renderDynamicItems();
+      } catch { /* silently fail — static gallery still works */ }
+    }
+
+    function renderDynamicItems() {
+      const grid = document.getElementById('galleryGrid');
+      // Remove old dynamic items
+      grid.querySelectorAll('.gallery-item-dynamic').forEach(el => el.remove());
+
+      galleryUploads.forEach((entry, i) => {
+        const div = document.createElement('div');
+        const sizeClass = gridSizes[i % gridSizes.length];
+        div.className = 'gallery-item ' + sizeClass + ' gallery-item-dynamic visible';
+        div.setAttribute('data-category', entry.category);
+
+        const label = entry.category === 'other'
+          ? (entry.customCategory || 'Other')
+          : entry.category.charAt(0).toUpperCase() + entry.category.slice(1);
+
+        div.innerHTML = '<img src="' + entry.url + '" alt="' + (entry.caption || label) + '" loading="lazy" />'
+          + '<div class="gallery-caption"><span>' + label + ' Mount</span>'
+          + (entry.caption ? '<em>' + entry.caption + '</em>' : '') + '</div>';
+
+        grid.appendChild(div);
+      });
+
+      // Apply current filter
+      applyFilter();
+    }
+
+    function filterMain(filter, btnEl) {
+      document.querySelectorAll('.gallery-filter').forEach(b => {
+        b.style.background = 'transparent';
+        b.style.borderColor = 'var(--rule)';
+        b.style.color = 'var(--muted)';
+      });
+      btnEl.style.background = 'var(--amber)';
+      btnEl.style.borderColor = 'var(--amber)';
+      btnEl.style.color = 'var(--bg)';
+
+      window._galleryFilter = filter;
+      applyFilter();
+    }
+    window._galleryFilter = 'all';
+
+    function applyFilter() {
+      const filter = window._galleryFilter;
+      const items = document.querySelectorAll('#galleryGrid .gallery-item');
+      items.forEach(item => {
+        const cat = item.getAttribute('data-category');
+        if (filter === 'all' || cat === filter) {
+          item.style.display = '';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+
+    // Load on page ready
+    loadDynamicGallery();
   </script>
 
 </body>

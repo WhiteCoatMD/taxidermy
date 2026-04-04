@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/WhiteCoatMD/taxidermy#readme",
   "dependencies": {
-    "@sendgrid/mail": "^8.1.6"
+    "@sendgrid/mail": "^8.1.6",
+    "@vercel/blob": "^2.3.3"
   }
 }
