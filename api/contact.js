@@ -85,8 +85,8 @@ export default async function handler(req, res) {
   try {
     await sgMail.send({
       to: toEmail,
-      from: fromEmail,
-      subject: `New Quote Request from ${name}${species ? ` — ${species}` : ''}`,
+      from: { email: fromEmail.trim(), name: 'Lonely Pines Taxidermy' },
+      subject: `New Quote Request from ${name}${species ? ' - ' + species : ''}`,
       html: htmlBody,
     });
     return res.status(200).json({ success: true, emailSent: true });
