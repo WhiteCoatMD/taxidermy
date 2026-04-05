@@ -89,10 +89,10 @@ export default async function handler(req, res) {
       subject: `New Quote Request from ${name}${species ? ` — ${species}` : ''}`,
       html: htmlBody,
     });
-
-    return res.status(200).json({ success: true });
   } catch (error) {
     console.error('Email send failed:', error);
-    return res.status(500).json({ error: 'Failed to send message' });
+    // Don't fail the request — lead is already saved to Blob
   }
+
+  return res.status(200).json({ success: true });
 }
