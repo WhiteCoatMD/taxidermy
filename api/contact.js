@@ -1,4 +1,22 @@
 import sgMail from '@sendgrid/mail';
+import { put, list } from '@vercel/blob';
+
+const LEADS_KEY = 'leads-manifest.json';
+
+async function getLeads() {
+  const { blobs } = await list({ prefix: LEADS_KEY });
+  if (blobs.length === 0) return [];
+  const res = await fetch(blobs[0].url);
+  return res.json();
+}
+
+async function saveLeads(leads) {
+  await put(LEADS_KEY, JSON.stringify(leads), {
+    access: 'public',
+    addRandomSuffix: false,
+    contentType: 'application/json',
+  });
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -11,10 +29,22 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Name is required' });
   }
 
+  // Save lead to Blob storage
+  try {
+    const leads = await getLeads();
+    leads.unshift({
+      id: Date.now().toString(),
+      name, phone, email, species, message,
+      submittedAt: new Date().toISOString(),
+      read: false,
+    });
+    await saveLeads(leads);
+  } catch (e) { console.error('Failed to save lead:', e); }
+
   const toEmail = process.env.CONTACT_EMAIL;
   const fromEmail = process.env.SENDGRID_FROM_EMAIL;
   if (!toEmail || !fromEmail) {
-    return res.status(500).json({ error: 'Email not configured' });
+    return res.status(200).json({ success: true });
   }
 
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);

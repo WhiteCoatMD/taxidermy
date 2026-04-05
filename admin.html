@@ -385,6 +385,70 @@
       text-transform: uppercase;
     }
 
+    /* ── LEAD CARDS ── */
+    .lead-card {
+      background: var(--bg);
+      border: 1px solid var(--rule);
+      padding: 0.85rem;
+      position: relative;
+      transition: border-color 0.2s;
+    }
+    .lead-card.unread { border-left: 3px solid var(--amber); }
+    .lead-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.4rem;
+    }
+    .lead-card-name {
+      font-family: var(--font-head);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--parchment);
+    }
+    .lead-card-time {
+      font-size: 0.6rem;
+      color: var(--muted);
+      font-family: var(--font-head);
+      letter-spacing: 0.1em;
+      white-space: nowrap;
+    }
+    .lead-card-details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.4rem;
+    }
+    .lead-card-detail {
+      font-size: 0.75rem;
+      color: var(--amber);
+    }
+    .lead-card-detail a { color: var(--amber); text-decoration: underline; }
+    .lead-card-msg {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-top: 0.3rem;
+    }
+    .lead-card-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .lead-card-actions button {
+      font-family: var(--font-head);
+      font-size: 0.55rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.6rem;
+      border: 1px solid var(--rule);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .lead-card-actions button:hover { border-color: var(--amber); color: var(--amber); }
+    .lead-card-actions .delete-lead { border-color: var(--danger); color: var(--danger); }
+
     /* ── TOAST ── */
     .toast {
       position: fixed;
@@ -426,6 +490,16 @@
       <div class="admin-title"><span>LP</span> Admin</div>
       <button class="btn btn-ghost" onclick="logout()" style="padding:0.5rem 1rem; font-size:0.65rem;">Log Out</button>
     </header>
+
+    <!-- Leads Section -->
+    <div class="upload-section" id="leadsSection">
+      <div class="section-label" style="display:flex; align-items:center; justify-content:space-between;">
+        <span>Quote Requests <span id="leadsBadge" style="background:var(--amber);color:var(--bg);padding:0.15rem 0.5rem;font-size:0.65rem;margin-left:0.5rem;display:none;">0 new</span></span>
+        <button class="btn btn-ghost" onclick="markAllLeadsRead()" style="padding:0.3rem 0.7rem;font-size:0.55rem;">Mark All Read</button>
+      </div>
+      <div id="leadsList" style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.75rem;"></div>
+      <div id="leadsEmpty" style="text-align:center;padding:1.5rem;color:var(--muted);font-family:var(--font-head);font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;display:none;">No quote requests yet</div>
+    </div>
 
     <!-- Upload Section -->
     <div class="upload-section">
@@ -517,6 +591,7 @@
           document.getElementById('loginScreen').style.display = 'none';
           document.getElementById('adminPanel').style.display = 'block';
           loadGallery();
+          loadLeads();
         } else {
           errEl.style.display = 'block';
         }
@@ -824,6 +899,107 @@
       toast.className = 'toast' + (isError ? ' error' : '');
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // ── LEADS ──
+    let leadsData = [];
+
+    async function loadLeads() {
+      try {
+        const res = await fetch('/api/leads');
+        if (res.ok) leadsData = await res.json();
+        else leadsData = [];
+      } catch { leadsData = []; }
+      renderLeads();
+    }
+
+    function renderLeads() {
+      const list = document.getElementById('leadsList');
+      const empty = document.getElementById('leadsEmpty');
+      const badge = document.getElementById('leadsBadge');
+      const unreadCount = leadsData.filter(l => !l.read).length;
+
+      if (unreadCount > 0) {
+        badge.textContent = unreadCount + ' new';
+        badge.style.display = 'inline';
+      } else {
+        badge.style.display = 'none';
+      }
+
+      if (leadsData.length === 0) {
+        list.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+
+      empty.style.display = 'none';
+      list.innerHTML = leadsData.map(lead => {
+        const date = new Date(lead.submittedAt);
+        const timeAgo = getTimeAgo(date);
+        return `
+        <div class="lead-card ${lead.read ? '' : 'unread'}">
+          <div class="lead-card-header">
+            <div class="lead-card-name">${lead.name}</div>
+            <div class="lead-card-time">${timeAgo}</div>
+          </div>
+          <div class="lead-card-details">
+            ${lead.phone ? `<span class="lead-card-detail"><a href="tel:${lead.phone}">${lead.phone}</a></span>` : ''}
+            ${lead.email ? `<span class="lead-card-detail"><a href="mailto:${lead.email}">${lead.email}</a></span>` : ''}
+            ${lead.species ? `<span class="lead-card-detail">${lead.species}</span>` : ''}
+          </div>
+          ${lead.message ? `<div class="lead-card-msg">${lead.message}</div>` : ''}
+          <div class="lead-card-actions">
+            ${lead.read ? '' : `<button onclick="markLeadRead('${lead.id}')">Mark Read</button>`}
+            ${lead.phone ? `<button onclick="window.location.href='tel:${lead.phone}'">Call</button>` : ''}
+            <button class="delete-lead" onclick="deleteLead('${lead.id}')">Delete</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function getTimeAgo(date) {
+      const mins = Math.floor((Date.now() - date.getTime()) / 60000);
+      if (mins < 1) return 'just now';
+      if (mins < 60) return mins + 'm ago';
+      const hrs = Math.floor(mins / 60);
+      if (hrs < 24) return hrs + 'h ago';
+      const days = Math.floor(hrs / 24);
+      if (days < 7) return days + 'd ago';
+      return date.toLocaleDateString();
+    }
+
+    async function markLeadRead(id) {
+      await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, action: 'markRead' }),
+      });
+      const lead = leadsData.find(l => l.id === id);
+      if (lead) lead.read = true;
+      renderLeads();
+    }
+
+    async function markAllLeadsRead() {
+      await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'markAllRead' }),
+      });
+      leadsData.forEach(l => l.read = true);
+      renderLeads();
+      showToast('All marked as read');
+    }
+
+    async function deleteLead(id) {
+      if (!confirm('Delete this lead?')) return;
+      await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, action: 'delete' }),
+      });
+      leadsData = leadsData.filter(l => l.id !== id);
+      renderLeads();
+      showToast('Lead deleted');
     }
   </script>
 </body>
