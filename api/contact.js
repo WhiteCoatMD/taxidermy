@@ -1,21 +1,25 @@
 import sgMail from '@sendgrid/mail';
-import { put, list } from '@vercel/blob';
+import { put, get } from '@vercel/blob';
 
 const LEADS_KEY = 'leads-manifest.json';
+// Leads contain customer PII, so they live in a separate PRIVATE Blob store
+// (not the public gallery store). Reads/writes require this store's token.
+const LEADS_TOKEN = process.env.LEADS_READ_WRITE_TOKEN;
 
 async function getLeads() {
-  const { blobs } = await list({ prefix: LEADS_KEY });
-  if (blobs.length === 0) return [];
-  const res = await fetch(blobs[0].url);
-  return res.json();
+  const result = await get(LEADS_KEY, { access: 'private', token: LEADS_TOKEN });
+  if (!result) return []; // get() returns null when the blob doesn't exist yet
+  const text = await new Response(result.stream).text();
+  return text ? JSON.parse(text) : [];
 }
 
 async function saveLeads(leads) {
   await put(LEADS_KEY, JSON.stringify(leads), {
-    access: 'public',
+    access: 'private',
     addRandomSuffix: false,
     allowOverwrite: true,
     contentType: 'application/json',
+    token: LEADS_TOKEN,
   });
 }
 
