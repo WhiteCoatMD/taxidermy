@@ -15,6 +15,7 @@ export async function saveManifest(entries) {
   await put(MANIFEST_KEY, JSON.stringify(entries), {
     access: 'public',
     addRandomSuffix: false,
+    allowOverwrite: true,
     contentType: 'application/json',
   });
 }

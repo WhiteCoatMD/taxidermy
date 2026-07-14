@@ -22,6 +22,7 @@ async function saveHiddenIds(ids) {
   await put(HIDDEN_KEY, JSON.stringify(ids), {
     access: 'public',
     addRandomSuffix: false,
+    allowOverwrite: true,
     contentType: 'application/json',
   });
 }

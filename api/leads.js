@@ -22,6 +22,7 @@ async function saveLeads(leads) {
   await put(LEADS_KEY, JSON.stringify(leads), {
     access: 'public',
     addRandomSuffix: false,
+    allowOverwrite: true,
     contentType: 'application/json',
   });
 }
