@@ -2168,6 +2168,18 @@
 
       if (!Array.isArray(slides) || slides.length === 0) return; // empty → keep fallback
 
+      // Re-inserts the original static photo if every slide fails to load, so a
+      // stale manifest (e.g. a since-deleted gallery photo) never leaves the
+      // frame permanently blank.
+      function ensureFallback() {
+        if (frame.querySelector('.about-slide') || frame.querySelector('.about-fallback')) return;
+        const img = document.createElement('img');
+        img.src = 'public/father-son.jpg';
+        img.alt = 'Father and son team with award-winning deer mounts and purple ribbon';
+        img.className = 'about-fallback';
+        frame.appendChild(img);
+      }
+
       // Replace the fallback image with layered, crossfading slides.
       frame.querySelectorAll('img').forEach(el => el.remove());
       slides.forEach((s, i) => {
@@ -2176,23 +2188,26 @@
         img.alt = 'Lonely Pines Taxidermy work';
         img.className = 'about-slide' + (i === 0 ? ' is-active' : '');
         img.loading = i === 0 ? 'eager' : 'lazy';
-        // A deleted gallery photo would 404 — drop that slide instead of showing a broken image.
-        img.onerror = () => img.remove();
+        // A deleted gallery photo would 404 — drop that slide; if it was the
+        // last one standing, restore the static fallback rather than go blank.
+        img.onerror = () => { img.remove(); ensureFallback(); };
         frame.appendChild(img);
       });
 
-      const visible = () => frame.querySelectorAll('.about-slide');
-      if (visible().length <= 1) return; // single photo → no animation
+      const slideEls = () => frame.querySelectorAll('.about-slide');
+      if (slideEls().length <= 1) return; // single photo → no animation
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-      let idx = 0;
       setInterval(() => {
-        const imgs = visible();
+        const imgs = Array.from(slideEls());
         if (imgs.length <= 1) return;
-        if (idx >= imgs.length) idx = 0;
-        imgs[idx].classList.remove('is-active');
-        idx = (idx + 1) % imgs.length;
-        imgs[idx].classList.add('is-active');
+        // Track the active slide by element, not a cached index, so a slide
+        // removing itself mid-cycle can't misalign the rotation.
+        const current = frame.querySelector('.about-slide.is-active');
+        const curIdx = current ? imgs.indexOf(current) : -1;
+        if (current) current.classList.remove('is-active');
+        const next = imgs[(curIdx + 1) % imgs.length];
+        next.classList.add('is-active');
       }, 5000);
     }
 
