@@ -409,6 +409,14 @@
       transform: scale(1.03);
       filter: brightness(0.85) saturate(0.9) sepia(0.1);
     }
+    .about-frame img.about-slide {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 1.2s ease, transform 0.6s ease, filter 0.6s ease;
+      z-index: 0;
+    }
+    .about-frame img.about-slide.is-active { opacity: 1; }
     /* Warm vignette */
     .about-frame::after {
       content: '';
@@ -1449,7 +1457,7 @@
       <div class="about-secondary">
         <img src="public/skull.jpg" alt="European skull mount" />
       </div>
-      <div class="about-frame">
+      <div class="about-frame" id="aboutFrame">
         <img src="public/father-son.jpg" alt="Father and son team with award-winning deer mounts and purple ribbon" />
       </div>
       <div class="about-badge">
@@ -2147,8 +2155,50 @@
       });
     }
 
+    // ── OUR STORY SLIDESHOW ──
+    async function loadAboutSlideshow() {
+      const frame = document.getElementById('aboutFrame');
+      if (!frame) return;
+
+      let slides = [];
+      try {
+        const res = await fetch('/api/about');
+        if (res.ok) slides = await res.json();
+      } catch { return; } // network error → keep the static fallback image
+
+      if (!Array.isArray(slides) || slides.length === 0) return; // empty → keep fallback
+
+      // Replace the fallback image with layered, crossfading slides.
+      frame.querySelectorAll('img').forEach(el => el.remove());
+      slides.forEach((s, i) => {
+        const img = document.createElement('img');
+        img.src = s.url;
+        img.alt = 'Lonely Pines Taxidermy work';
+        img.className = 'about-slide' + (i === 0 ? ' is-active' : '');
+        img.loading = i === 0 ? 'eager' : 'lazy';
+        // A deleted gallery photo would 404 — drop that slide instead of showing a broken image.
+        img.onerror = () => img.remove();
+        frame.appendChild(img);
+      });
+
+      const visible = () => frame.querySelectorAll('.about-slide');
+      if (visible().length <= 1) return; // single photo → no animation
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      let idx = 0;
+      setInterval(() => {
+        const imgs = visible();
+        if (imgs.length <= 1) return;
+        if (idx >= imgs.length) idx = 0;
+        imgs[idx].classList.remove('is-active');
+        idx = (idx + 1) % imgs.length;
+        imgs[idx].classList.add('is-active');
+      }, 5000);
+    }
+
     // Load on page ready
     loadDynamicGallery();
+    loadAboutSlideshow();
   </script>
 
 </body>
