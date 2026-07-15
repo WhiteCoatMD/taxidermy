@@ -409,6 +409,14 @@
       transform: scale(1.03);
       filter: brightness(0.85) saturate(0.9) sepia(0.1);
     }
+    .about-frame img.about-slide {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 1.2s ease, transform 0.6s ease, filter 0.6s ease;
+      z-index: 0;
+    }
+    .about-frame img.about-slide.is-active { opacity: 1; }
     /* Warm vignette */
     .about-frame::after {
       content: '';
@@ -1449,7 +1457,7 @@
       <div class="about-secondary">
         <img src="public/skull.jpg" alt="European skull mount" />
       </div>
-      <div class="about-frame">
+      <div class="about-frame" id="aboutFrame">
         <img src="public/father-son.jpg" alt="Father and son team with award-winning deer mounts and purple ribbon" />
       </div>
       <div class="about-badge">
@@ -2147,8 +2155,65 @@
       });
     }
 
+    // ── OUR STORY SLIDESHOW ──
+    async function loadAboutSlideshow() {
+      const frame = document.getElementById('aboutFrame');
+      if (!frame) return;
+
+      let slides = [];
+      try {
+        const res = await fetch('/api/about');
+        if (res.ok) slides = await res.json();
+      } catch { return; } // network error → keep the static fallback image
+
+      if (!Array.isArray(slides) || slides.length === 0) return; // empty → keep fallback
+
+      // Re-inserts the original static photo if every slide fails to load, so a
+      // stale manifest (e.g. a since-deleted gallery photo) never leaves the
+      // frame permanently blank.
+      function ensureFallback() {
+        if (frame.querySelector('.about-slide') || frame.querySelector('.about-fallback')) return;
+        const img = document.createElement('img');
+        img.src = 'public/father-son.jpg';
+        img.alt = 'Father and son team with award-winning deer mounts and purple ribbon';
+        img.className = 'about-fallback';
+        frame.appendChild(img);
+      }
+
+      // Replace the fallback image with layered, crossfading slides.
+      frame.querySelectorAll('img').forEach(el => el.remove());
+      slides.forEach((s, i) => {
+        const img = document.createElement('img');
+        img.src = s.url;
+        img.alt = 'Lonely Pines Taxidermy work';
+        img.className = 'about-slide' + (i === 0 ? ' is-active' : '');
+        img.loading = i === 0 ? 'eager' : 'lazy';
+        // A deleted gallery photo would 404 — drop that slide; if it was the
+        // last one standing, restore the static fallback rather than go blank.
+        img.onerror = () => { img.remove(); ensureFallback(); };
+        frame.appendChild(img);
+      });
+
+      const slideEls = () => frame.querySelectorAll('.about-slide');
+      if (slideEls().length <= 1) return; // single photo → no animation
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      setInterval(() => {
+        const imgs = Array.from(slideEls());
+        if (imgs.length <= 1) return;
+        // Track the active slide by element, not a cached index, so a slide
+        // removing itself mid-cycle can't misalign the rotation.
+        const current = frame.querySelector('.about-slide.is-active');
+        const curIdx = current ? imgs.indexOf(current) : -1;
+        if (current) current.classList.remove('is-active');
+        const next = imgs[(curIdx + 1) % imgs.length];
+        next.classList.add('is-active');
+      }, 5000);
+    }
+
     // Load on page ready
     loadDynamicGallery();
+    loadAboutSlideshow();
   </script>
 
 </body>

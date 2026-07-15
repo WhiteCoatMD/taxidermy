@@ -563,6 +563,27 @@
       <div class="empty-state" id="emptyState" style="display:none;">No images uploaded yet</div>
     </div>
 
+    <!-- Our Story Slideshow -->
+    <div class="upload-section">
+      <div class="section-label">Our Story Slideshow (Homepage Photo)</div>
+      <p style="color:var(--muted);font-size:0.75rem;margin:0 0 0.75rem;line-height:1.5;">
+        These photos rotate in the "Our Story" section of the homepage. Upload new ones or add from your gallery below.
+      </p>
+
+      <label for="aboutFileInput" class="upload-zone">
+        <div class="upload-zone-icon">&#128247;</div>
+        <div class="upload-zone-text">Tap to <strong>add a photo</strong> to the slideshow</div>
+      </label>
+      <input type="file" id="aboutFileInput" accept="image/*" style="position:absolute;left:-9999px;opacity:0;" onchange="addAboutUpload(this.files)" />
+
+      <div class="section-label" style="margin-top:1rem;">Current Slideshow Photos</div>
+      <div class="manage-grid" id="aboutSlidesGrid"></div>
+      <div class="empty-state" id="aboutSlidesEmpty" style="display:none;">No slideshow photos yet — the homepage shows the default photo</div>
+
+      <div class="section-label" style="margin-top:1rem;">Add From Gallery</div>
+      <div class="manage-grid" id="aboutPickerGrid"></div>
+    </div>
+
   </div>
 
   <!-- Toast -->
@@ -590,7 +611,7 @@
         if (res.ok) {
           document.getElementById('loginScreen').style.display = 'none';
           document.getElementById('adminPanel').style.display = 'block';
-          loadGallery();
+          loadGallery().then(loadAboutSlides);
           loadLeads();
         } else {
           errEl.style.display = 'block';
@@ -799,6 +820,104 @@
       { id: 'static-22', url: 'public/Tripp/bear_on_limb.jpg', category: 'bear', caption: 'Bear on branch', static: true },
       { id: 'static-23', url: 'public/bear.jpg', category: 'bear', caption: 'Bear on tree — original', static: true },
     ];
+
+    // ── OUR STORY SLIDESHOW ──
+    let aboutSlides = [];
+
+    async function loadAboutSlides() {
+      try {
+        const res = await fetch('/api/about');
+        aboutSlides = res.ok ? await res.json() : [];
+      } catch { aboutSlides = []; }
+      renderAboutSlides();
+      renderAboutPicker();
+    }
+
+    function renderAboutSlides() {
+      const grid = document.getElementById('aboutSlidesGrid');
+      const empty = document.getElementById('aboutSlidesEmpty');
+      grid.innerHTML = '';
+      empty.style.display = aboutSlides.length === 0 ? 'block' : 'none';
+      aboutSlides.forEach(s => {
+        const div = document.createElement('div');
+        div.className = 'manage-item';
+        div.innerHTML =
+          '<img src="' + s.url + '" alt="Slideshow photo" />' +
+          '<button class="manage-item-delete" title="Remove" onclick="removeAboutSlide(\'' + s.id + '\')">&times;</button>';
+        grid.appendChild(div);
+      });
+    }
+
+    function renderAboutPicker() {
+      const grid = document.getElementById('aboutPickerGrid');
+      grid.innerHTML = '';
+      // galleryData is built by loadGallery(): uploaded photos + staticImages.
+      const usedRefIds = new Set(aboutSlides.map(s => s.refId).filter(Boolean));
+      galleryData.forEach(g => {
+        const div = document.createElement('div');
+        const already = usedRefIds.has(g.id);
+        div.className = 'manage-item' + (already ? ' picker-used' : '');
+        div.style.opacity = already ? '0.35' : '1';
+        div.innerHTML = '<img src="' + g.url + '" alt="Gallery photo" />';
+        if (!already) {
+          div.style.cursor = 'pointer';
+          div.onclick = () => addFromGallery(g.id, g.url);
+        }
+        grid.appendChild(div);
+      });
+    }
+
+    async function addAboutUpload(files) {
+      if (!files || files.length === 0) return;
+      const file = files[0];
+      try {
+        const compressed = await compressImage(file);
+        const res = await fetch('/api/about', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'add-upload', image: compressed, filename: file.name }),
+        });
+        if (!res.ok) throw new Error('server error (' + res.status + ')');
+        showToast('Photo added to slideshow!');
+        await loadAboutSlides();
+      } catch (err) {
+        console.error('Slideshow upload failed:', err);
+        showToast('Could not add photo — ' + (err.message || 'unknown error'), true);
+      }
+      document.getElementById('aboutFileInput').value = '';
+    }
+
+    async function addFromGallery(refId, url) {
+      try {
+        const res = await fetch('/api/about', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'add-gallery', refId, url }),
+        });
+        if (!res.ok) throw new Error('server error (' + res.status + ')');
+        showToast('Added to slideshow!');
+        await loadAboutSlides();
+      } catch (err) {
+        console.error('Add-from-gallery failed:', err);
+        showToast('Could not add photo', true);
+      }
+    }
+
+    async function removeAboutSlide(id) {
+      try {
+        const res = await fetch('/api/about', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'remove', id }),
+        });
+        if (!res.ok) throw new Error('server error (' + res.status + ')');
+        showToast('Removed from slideshow');
+        await loadAboutSlides();
+      } catch (err) {
+        console.error('Remove slide failed:', err);
+        showToast('Could not remove photo', true);
+      }
+    }
 
     // ── GALLERY MANAGEMENT ──
     async function loadGallery() {
