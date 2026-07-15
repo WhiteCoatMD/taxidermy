@@ -19,6 +19,26 @@ function isAuthenticated(req) {
   return match.split('=')[1].trim() === expected;
 }
 
+// Only ever store known-safe raster image extensions. Prevents an uploaded
+// filename like "x.svg"/"x.html" from setting an executable content-type on a
+// public blob (stored-XSS). Client always sends compressed JPEG, so this never
+// rejects a real upload — it just bounds the content-type.
+const SAFE_IMAGE_EXT = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+
+// A gallery reference must point at our own storage: a same-origin static path
+// (public/...) or a Vercel Blob URL. Blocks arbitrary attacker-chosen URLs from
+// being stored and later rendered on the homepage.
+function isSafeGalleryUrl(url) {
+  if (typeof url !== 'string') return false;
+  if (/^public\/[^\s]+$/.test(url)) return true;
+  try {
+    const u = new URL(url);
+    return u.protocol === 'https:' && u.hostname.endsWith('.blob.vercel-storage.com');
+  } catch {
+    return false;
+  }
+}
+
 async function getSlides() {
   const { blobs } = await list({ prefix: MANIFEST_KEY });
   if (blobs.length === 0) return [];
@@ -68,7 +88,8 @@ export default async function handler(req, res) {
       const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
       const buffer = Buffer.from(base64Data, 'base64');
       const id = crypto.randomUUID();
-      const ext = filename?.split('.').pop()?.toLowerCase() || 'jpg';
+      const rawExt = filename?.split('.').pop()?.toLowerCase() || 'jpg';
+      const ext = SAFE_IMAGE_EXT.includes(rawExt) ? rawExt : 'jpg';
       const blob = await put(`about/${id}.${ext}`, buffer, {
         access: 'public',
         contentType: `image/${ext === 'jpg' ? 'jpeg' : ext}`,
@@ -83,6 +104,7 @@ export default async function handler(req, res) {
     if (action === 'add-gallery') {
       const { refId, url } = req.body;
       if (!refId || !url) return res.status(400).json({ error: 'refId and url are required' });
+      if (!isSafeGalleryUrl(url)) return res.status(400).json({ error: 'Invalid image URL' });
       if (slides.some(s => s.refId === refId)) {
         return res.status(200).json({ success: true, duplicate: true });
       }
