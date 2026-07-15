@@ -29,8 +29,13 @@ const SAFE_IMAGE_EXT = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
 // (public/...) or a Vercel Blob URL. Blocks arbitrary attacker-chosen URLs from
 // being stored and later rendered on the homepage.
 function isSafeGalleryUrl(url) {
-  if (typeof url !== 'string') return false;
-  if (/^public\/[^\s]+$/.test(url)) return true;
+  if (typeof url !== 'string' || url.length > 2048) return false;
+  // Reject characters that could break out of an HTML attribute in the admin
+  // panel, plus path traversal — applies to both accepted forms below.
+  if (/["'<>\\]/.test(url) || url.includes('..')) return false;
+  // Same-origin static gallery path — may legitimately contain spaces, e.g.
+  // "public/Tripp/duck_in_flight (1).jpg".
+  if (url.startsWith('public/')) return true;
   try {
     const u = new URL(url);
     return u.protocol === 'https:' && u.hostname.endsWith('.blob.vercel-storage.com');
