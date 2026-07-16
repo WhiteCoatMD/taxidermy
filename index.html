@@ -388,6 +388,8 @@
       aspect-ratio: 4/3;
       overflow: hidden;
       border: 1px solid var(--rule);
+      /* Smoothly grow/shrink when the active photo's shape changes. */
+      transition: aspect-ratio 0.6s ease;
     }
     .about-frame::before {
       content: '';
@@ -413,6 +415,9 @@
       position: absolute;
       inset: 0;
       opacity: 0;
+      /* contain = show the whole photo; the frame is sized to match the active
+         photo (JS), so it fills exactly, and mid-crossfade photos never crop. */
+      object-fit: contain;
       transition: opacity 1.2s ease, transform 0.6s ease, filter 0.6s ease;
       z-index: 0;
     }
@@ -2173,6 +2178,14 @@
 
       if (!Array.isArray(slides) || slides.length === 0) return; // empty → keep fallback
 
+      // Sizes the frame to match a photo's shape so the whole photo shows —
+      // no cropping, no empty bars. Called for whichever slide is active.
+      function applyRatio(img) {
+        if (img && img.naturalWidth && img.naturalHeight) {
+          frame.style.aspectRatio = img.naturalWidth + ' / ' + img.naturalHeight;
+        }
+      }
+
       // Re-inserts the original static photo if every slide fails to load, so a
       // stale manifest (e.g. a since-deleted gallery photo) never leaves the
       // frame permanently blank.
@@ -2182,6 +2195,7 @@
         img.src = 'public/father-son.jpg';
         img.alt = 'Father and son team with award-winning deer mounts and purple ribbon';
         img.className = 'about-fallback';
+        img.onload = () => applyRatio(img);
         frame.appendChild(img);
       }
 
@@ -2193,11 +2207,15 @@
         img.alt = 'Lonely Pines Taxidermy work';
         img.className = 'about-slide' + (i === 0 ? ' is-active' : '');
         img.loading = i === 0 ? 'eager' : 'lazy';
+        // Size the frame to whichever photo is active when it finishes loading.
+        img.onload = () => { if (img.classList.contains('is-active')) applyRatio(img); };
         // A deleted gallery photo would 404 — drop that slide; if it was the
         // last one standing, restore the static fallback rather than go blank.
         img.onerror = () => { img.remove(); ensureFallback(); };
         frame.appendChild(img);
       });
+      // If the first slide is already cached, size the frame to it right away.
+      applyRatio(frame.querySelector('.about-slide.is-active'));
 
       const slideEls = () => frame.querySelectorAll('.about-slide');
       if (slideEls().length <= 1) return; // single photo → no animation
@@ -2213,6 +2231,7 @@
         if (current) current.classList.remove('is-active');
         const next = imgs[(curIdx + 1) % imgs.length];
         next.classList.add('is-active');
+        applyRatio(next);
       }, 5000);
     }
 
